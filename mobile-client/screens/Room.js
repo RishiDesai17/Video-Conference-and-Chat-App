@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RTCView, mediaDevices } from 'react-native-webrtc';
+import Peer from 'simple-peer';
 
 const Room = (props) => {
     const [localStream, setLocalStream] = useState()
@@ -33,7 +34,6 @@ const Room = (props) => {
 
     return (
         <>
-            {/* <h1>Hi</h1> */}
             {localStream && <RTCView style={{width: '50%', height: "50%"}} streamURL={localStream.toURL()} />}
         </>
     )
