@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import Navigator from "./navigation/Navigator";
+import Navigator from "./src/navigation/Navigator";
 
 const App = () => {
   useEffect(() => {
