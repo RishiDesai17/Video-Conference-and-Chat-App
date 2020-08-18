@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from 'react-native';
+import { Button, BackHandler } from 'react-native';
 import { RTCView, mediaDevices } from 'react-native-webrtc';
 import Peer from 'simple-peer';
+import BackPressUtil from "../utils/BackPressUtil";
 
 const Room = (props) => {
     const [localStream, setLocalStream] = useState()
@@ -9,6 +10,7 @@ const Room = (props) => {
 
     useEffect(() => {
         startLocalStream()
+        BackHandler.addEventListener('hardwareBackPress', BackPressUtil)
     }, [])
 
     const startLocalStream = async () => {
