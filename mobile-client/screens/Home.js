@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Text } from 'react-native';
 import useStore from '../zustand/store';
+import shallow from 'zustand/shallow'
+import Chat from './Chat';
 
 const Home = (props) => {
     const [state, setState] = useState()
-    const { navigation } = props
-    const inMeet = useStore(state => state.inMeet)
-    const changeInMeet = useStore(state => state.changeInMeet)
+    const { inMeet, setMeetState } = useStore(useCallback(state => ({ inMeet: state.inMeet, setMeetState: state.setMeetState }), []), shallow)
 
     return (
         <>
-            <Button title="Room" onPress={() => navigation.navigate("Room")} />
             <Text>{inMeet.toString()}</Text>
-            <Button title="swap" onPress={changeInMeet} />
+            <Button title="Meet" onPress={() => setMeetState(true)} />
         </>
     )
 }

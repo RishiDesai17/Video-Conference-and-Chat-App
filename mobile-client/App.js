@@ -7,7 +7,7 @@ const App = () => {
   }, [])
 
   const initTest = async() => {
-    const response = await fetch("http://192.168.1.100:3001/test")
+    const response = await fetch("http://192.168.43.53:3001/test")
     const res = await response.text()
     console.log(res)
   }

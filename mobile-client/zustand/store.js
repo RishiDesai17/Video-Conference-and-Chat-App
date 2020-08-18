@@ -1,9 +1,10 @@
-import React from 'react';
-import create from 'zustand'
+import create from 'zustand';
 
 const [useStore] = create(set => ({
     inMeet: false,
-    changeInMeet: () => set(state => ({ inMeet: !state.inMeet })),
+    isLoggedIn: false,
+    setMeetState: (boolean) => set(state => ({ inMeet: boolean })),
+    setLoginState: (boolean) => set(state => ({ isLoggedIn: boolean }))
 }))
 
 export default useStore

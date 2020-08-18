@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Button } from 'react-native';
 import { RTCView, mediaDevices } from 'react-native-webrtc';
 import Peer from 'simple-peer';
 
 const Room = (props) => {
     const [localStream, setLocalStream] = useState()
+    const { navigation } = props
 
     useEffect(() => {
         startLocalStream()
@@ -35,6 +37,7 @@ const Room = (props) => {
     return (
         <>
             {localStream && <RTCView style={{width: '50%', height: "50%"}} streamURL={localStream.toURL()} />}
+            <Button title="Chat" onPress={() => navigation.navigate("Chat")} />
         </>
     )
 }
