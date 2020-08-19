@@ -16,16 +16,16 @@ const Room = (props) => {
         socket.current = io.connect("http://192.168.43.53:3001/")
         initSocket()
         startLocalStream()
-        BackHandler.addEventListener('hardwareBackPress', leaveMeetHandler)
+        // BackHandler.addEventListener('hardwareBackPress', leaveMeetHandler)
     }, [])
 
     const initSocket = () =>  {
-        if(host){
-            socket.current.emit("start meet", roomID)
-        }
-        else{
+        // if(host){
+        //     socket.current.emit("start meet", roomID)
+        // }
+        // else{
             socket.current.emit("join room", roomID)
-        }
+        // }
         socket.current.on("room full", () => {
             console.log("room full")
             setMeetState({ inMeet: false, roomID: null, host: null })
@@ -93,19 +93,9 @@ const Room = (props) => {
     return (
         <>
             {localStream && <RTCView style={{width: '50%', height: "50%"}} streamURL={localStream.toURL()} />}
-            <Button title="Hang Up" onPress={disconnect} />
             <Button title="Chat" onPress={() => {
                 navigation.navigate("Chat")
                 // leaveMeetRef.current.remove()
-            }} />
-            <Button title="Room1" onPress={() => {
-                navigation.navigate("Room1")
-            }} />
-            <Button title="Room2" onPress={() => {
-                navigation.navigate("Room2")
-            }} />
-            <Button title="Room3" onPress={() => {
-                navigation.navigate("Room3")
             }} />
         </>
     )

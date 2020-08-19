@@ -1,6 +1,6 @@
 import { BackHandler, Alert } from 'react-native';
 
-const handleBackPress = () => {
+const ExitAppUtil = () => {
     Alert.alert(
         "Exit App",
         "Do you really want to quit?",
@@ -11,8 +11,7 @@ const handleBackPress = () => {
                 style: "cancel"
             },
             { 
-                text: "No", 
-                onPress: () => console.log("OK Pressed") 
+                text: "No"
             }
         ],
         { cancelable: false }
@@ -20,4 +19,4 @@ const handleBackPress = () => {
     return true
 }
 
-export default handleBackPress
+export default ExitAppUtil

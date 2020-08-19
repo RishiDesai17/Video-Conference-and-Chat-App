@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import useStore from '../zustand/store';
 import shallow from 'zustand/shallow'
 import { Text, Button, BackHandler } from 'react-native';
-import BackPressUtil from "../utils/BackPressUtil";
+import ExitAppUtil from "../utils/ExitAppUtil";
 
 const Login = (props) => {
     const [state, setState] = useState()
     const setLoginState = useStore(useCallback(state => state.setLoginState, []), shallow)
 
     useEffect(() => {
-        BackHandler.addEventListener('hardwareBackPress', BackPressUtil)
+        BackHandler.addEventListener('hardwareBackPress', ExitAppUtil)
     }, [])
 
     return (
