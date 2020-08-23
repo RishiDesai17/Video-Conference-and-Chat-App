@@ -9,7 +9,7 @@ const Home: React.FC = () => {
     console.log(context)
 
     const joinRoom = () => {
-        history.push(`/room/${inputRef.current}`)
+        history.push(`/room?room=${inputRef.current}`)
     }
 
     return(

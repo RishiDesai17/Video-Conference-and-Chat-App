@@ -13,12 +13,12 @@ app.use(cors())
 io.on("connection", (socket) => {
     console.log("connection")
 
-    socket.on("start meet", ({ roomID, peerID }) => {
+    socket.on("start meet", (roomID) => {
         console.log(roomID, socket.id)
         socket.join(roomID)
     })
 
-    socket.on("join room", ({ roomID, peerID }) => {
+    socket.on("join room", (roomID) => {
         console.log(roomID, socket.id)
         if(!uuid.validate(roomID)){
             socket.emit("invalid room")
