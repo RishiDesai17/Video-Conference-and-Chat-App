@@ -5,6 +5,7 @@ const http = require('http')
 const socket = require('socket.io')
 const server = http.createServer(app)
 const io = socket(server)
+const uuid = require('uuid')
 
 app.use(express.json())
 app.use(cors())
@@ -12,12 +13,17 @@ app.use(cors())
 io.on("connection", (socket) => {
     console.log("connection")
 
-    socket.on("start meet", (roomID) => {
+    socket.on("start meet", ({ roomID, peerID }) => {
         console.log(roomID, socket.id)
         socket.join(roomID)
     })
 
-    socket.on("join room", (roomID) => {
+    socket.on("join room", ({ roomID, peerID }) => {
+        console.log(roomID, socket.id)
+        if(!uuid.validate(roomID)){
+            socket.emit("invalid room")
+            return;
+        }
         const roomData = io.sockets.adapter.rooms[roomID]
         if(!roomData){
             socket.emit("invalid room")
@@ -28,10 +34,21 @@ io.on("connection", (socket) => {
             return;
         }
         socket.join(roomID)
-        const usersInThisRoom = Object.keys(io.sockets.adapter.rooms[roomID].sockets)
-        socket.to(roomID).emit("all users", usersInThisRoom);
+        socket.to(roomID).broadcast.emit('user joined', peerID)
+        // const usersInThisRoom = Object.keys(io.sockets.adapter.rooms[roomID].sockets)
+        // socket.to(roomID).emit("all users", usersInThisRoom);
         // socket.emit("all users", usersInThisRoom);
     })
+
+    socket.on("sending signal", payload => {
+        console.log("sending signal")
+        io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
+    });
+
+    socket.on("returning signal", payload => {
+        console.log("returning signal")
+        io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
+    });
 
     socket.on("disconnect", () => {
         console.log("disconnect " + socket.id)
