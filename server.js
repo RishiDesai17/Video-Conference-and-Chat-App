@@ -20,10 +20,10 @@ io.on("connection", (socket) => {
 
     socket.on("join room", (roomID) => {
         console.log(roomID, socket.id)
-        if(!uuid.validate(roomID)){
-            socket.emit("invalid room")
-            return;
-        }
+        // if(!uuid.validate(roomID)){
+        //     socket.emit("invalid room")
+        //     return;
+        // }
         const roomData = io.sockets.adapter.rooms[roomID]
         if(!roomData){
             socket.emit("invalid room")
@@ -34,9 +34,10 @@ io.on("connection", (socket) => {
             return;
         }
         socket.join(roomID)
-        socket.to(roomID).broadcast.emit('user joined', peerID)
-        // const usersInThisRoom = Object.keys(io.sockets.adapter.rooms[roomID].sockets)
-        // socket.to(roomID).emit("all users", usersInThisRoom);
+        // socket.to(roomID).broadcast.emit('user joined', peerID)
+        const usersInThisRoom = Object.keys(io.sockets.adapter.rooms[roomID].sockets)
+        console.log(usersInThisRoom)
+        socket.to(roomID).broadcast.emit("all users", usersInThisRoom);
         // socket.emit("all users", usersInThisRoom);
     })
 
