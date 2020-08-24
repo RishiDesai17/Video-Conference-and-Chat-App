@@ -18,6 +18,7 @@ io.on("connection", (socket) => {
         const roomID = uuid.v4()
         socket.join(roomID)
         io.to(socket.id).emit("roomID", roomID)
+        console.log(Object.keys(io.sockets.adapter.sids[socket.id]))
     })
 
     socket.on("join room", (roomID) => {
@@ -39,6 +40,7 @@ io.on("connection", (socket) => {
         const usersInThisRoom = Object.keys(io.sockets.adapter.rooms[roomID].sockets)
         console.log(usersInThisRoom)
         io.to(socket.id).emit("all users", usersInThisRoom);
+        console.log(Object.keys(io.sockets.adapter.sids[socket.id]))
     })
 
     socket.on("sending signal", payload => {
@@ -50,6 +52,12 @@ io.on("connection", (socket) => {
         console.log("returning signal")
         io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
     });
+
+    socket.on("message", ({ message, roomID }) => {
+        console.log(message, roomID)
+        socket.broadcast.to(roomID).emit('receiveMsg', { sender: socket.id, message });
+        // socket.to(roomID).broadcast.emit("receiveMsg", { sender: socket.id, message })
+    })
 
     socket.on("disconnect", () => {
         console.log("disconnect " + socket.id)

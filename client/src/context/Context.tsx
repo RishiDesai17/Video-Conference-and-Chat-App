@@ -2,8 +2,7 @@ import React, { createContext, useState } from "react";
 
 interface STATE {
     loggedIn: boolean,
-    host: boolean,
-    inMeet: boolean
+    host: boolean
 }
 
 interface CONTEXT {
@@ -17,8 +16,7 @@ type Props = {
 
 const INIT_STATE: STATE = {
     loggedIn: false,
-    host: false,
-    inMeet: false
+    host: false
 }
 
 const CONTEXT_DEFN: CONTEXT = {
@@ -34,11 +32,9 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
     const meetHandler = (host: boolean) => {
         setState({
             ...state,
-            host,
-            inMeet: true
+            host
         })
     }
-    
 
     return(
         <Context.Provider value={{

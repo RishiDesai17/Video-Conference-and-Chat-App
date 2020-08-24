@@ -6,6 +6,7 @@ import * as queryString from 'query-string';
 import Video from '../components/Video';
 import { Context } from "../context/Context";
 import './styles/Room.css';
+import ChatBox from "../components/ChatBox";
 
 interface PeersRef {
     peerID: string,
@@ -17,11 +18,19 @@ interface Payload {
     id: string
 }
 
+interface Message {
+    sender: string,
+    message: string
+}
+
 const Room: React.FC = (props) => {
     const userVideo = useRef<HTMLVideoElement>(document.createElement('video'))
+    const userStream = useRef<MediaStream>()
     const socketRef = useRef<SocketIOClient.Socket>(io.Socket)
+    const room = useRef<string>("")
     const [peers, setPeers] = useState<Array<Peer.Instance>>([])
     const peersRef = useRef<Array<PeersRef>>([])
+    const [showChat, setShowChat] = useState<boolean>(false)
     const context = useContext(Context)
     const history = useHistory()
 
@@ -32,33 +41,37 @@ const Room: React.FC = (props) => {
     const init = useCallback(async() => {
         socketRef.current = io.connect("/")
         const stream: MediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-        userVideo.current.srcObject = stream
+        userVideo.current.srcObject = userStream.current = stream
         // const queryParams: queryString.ParsedQuery<string> = queryString.parse(window.location.search)
         // console.log(queryParams.room)
         if(context.state.host){
             socketRef.current.emit("start meet")
             socketRef.current.on("roomID", (roomID: string) => {
                 console.log(roomID)
+                room.current = roomID
+                setShowChat(true)
             })
         }
         else{
             const queryParams: queryString.ParsedQuery<string> = queryString.parse(window.location.search)
             console.log(queryParams.room)
-            if(!queryParams.room){
+            if(!queryParams.room || typeof queryParams.room !== 'string'){
                 alert("Enter a valid url")
-                history.replace("/")
-                return
+                exit()
+                return;
             }
+            room.current = queryParams.room
+            setShowChat(true)
             socketRef.current.emit("join room", queryParams.room)
             socketRef.current.on("invalid room", () => {
                 alert("Invalid room")
-                history.replace("/")
-                return
+                exit()
+                return;
             })
             socketRef.current.on("room full", () => {
-                alert("Room")
-                history.replace("/")
-                return
+                alert("Room full")
+                exit()
+                return;
             })
         }
         socketRef.current.on("all users", (users: string[]) => {
@@ -96,6 +109,7 @@ const Room: React.FC = (props) => {
                 item.peer.signal(signal)
             }
         })
+
     }, [])
 
     const createPeer = (userToSignal: string, callerID: string, stream: MediaStream) => {
@@ -127,6 +141,14 @@ const Room: React.FC = (props) => {
         peer.signal(incomingSignal)
         return peer
     }
+
+    const exit = () => {
+        socketRef.current.disconnect()
+        history.replace("/")
+        userStream.current?.getTracks().forEach((track) => {
+            track.stop();
+        });
+    }
     
     return(
         <>
@@ -136,6 +158,7 @@ const Room: React.FC = (props) => {
                     <Video peer={peer} />
                 ))}
             </div>
+            {showChat && <ChatBox socket={socketRef.current} roomID={room.current} />}
         </>
     )
 }
