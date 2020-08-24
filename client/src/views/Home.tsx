@@ -6,20 +6,20 @@ const Home: React.FC = () => {
     const inputRef = useRef<string>("")
     const history = useHistory()
     const context = useContext(Context)
-    console.log(context)
 
-    const joinRoom = () => {
+    const meet = (host: boolean) => {
+        context.meetHandler(host)
         history.push(`/room?room=${inputRef.current}`)
     }
 
     return(
         <>
-            <button>HOST MEETING</button>
+            <button onClick={() => meet(true)}>HOST MEETING</button>
             <p>--OR--</p>
             <input onChange={e => {
                 inputRef.current = e.target.value
             }} />
-            <button onClick={joinRoom}>JOIN</button>
+            <button onClick={() => meet(false)}>JOIN</button>
         </>
     )
 }

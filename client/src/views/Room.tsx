@@ -1,8 +1,11 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useContext } from "react";
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
+import { useHistory } from 'react-router-dom';
 import * as queryString from 'query-string';
-import Video from '../components/Video.jsx';
+import Video from '../components/Video';
+import { Context } from "../context/Context";
+import './styles/Room.css';
 
 interface PeersRef {
     peerID: string,
@@ -19,6 +22,8 @@ const Room: React.FC = (props) => {
     const socketRef = useRef<SocketIOClient.Socket>(io.Socket)
     const [peers, setPeers] = useState<Array<Peer.Instance>>([])
     const peersRef = useRef<Array<PeersRef>>([])
+    const context = useContext(Context)
+    const history = useHistory()
 
     useEffect(() => {
         init()
@@ -28,12 +33,34 @@ const Room: React.FC = (props) => {
         socketRef.current = io.connect("/")
         const stream: MediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
         userVideo.current.srcObject = stream
-        const queryParams: queryString.ParsedQuery<string> = queryString.parse(window.location.search)
-        console.log(queryParams.room)
-        if(!queryParams.room){
-            // alert("")
+        // const queryParams: queryString.ParsedQuery<string> = queryString.parse(window.location.search)
+        // console.log(queryParams.room)
+        if(context.state.host){
+            socketRef.current.emit("start meet")
+            socketRef.current.on("roomID", (roomID: string) => {
+                console.log(roomID)
+            })
         }
-        socketRef.current.emit("join room", queryParams.room)
+        else{
+            const queryParams: queryString.ParsedQuery<string> = queryString.parse(window.location.search)
+            console.log(queryParams.room)
+            if(!queryParams.room){
+                alert("Enter a valid url")
+                history.replace("/")
+                return
+            }
+            socketRef.current.emit("join room", queryParams.room)
+            socketRef.current.on("invalid room", () => {
+                alert("Invalid room")
+                history.replace("/")
+                return
+            })
+            socketRef.current.on("room full", () => {
+                alert("Room")
+                history.replace("/")
+                return
+            })
+        }
         socketRef.current.on("all users", (users: string[]) => {
             const peers = users.reduce((result: Peer.Instance[], userID: string) => {
                 if(userID !== socketRef.current.id){
@@ -103,10 +130,12 @@ const Room: React.FC = (props) => {
     
     return(
         <>
-            <video autoPlay playsInline ref={userVideo} />
-            {peers.map((peer) => (
-                <Video peer={peer} />
-            ))}
+            <div id="video-grid">
+                <video autoPlay playsInline ref={userVideo} />
+                {peers.map((peer) => (
+                    <Video peer={peer} />
+                ))}
+            </div>
         </>
     )
 }
