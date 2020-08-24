@@ -24,26 +24,24 @@ io.on("connection", (socket) => {
         //     socket.emit("invalid room")
         //     return;
         // }
-        const roomData = io.sockets.adapter.rooms[roomID]
-        if(!roomData){
-            socket.emit("invalid room")
-            return;
-        }
-        if(roomData.length === 100){
-            socket.emit("room full")
-            return;
-        }
+        // const roomData = io.sockets.adapter.rooms[roomID]
+        // if(!roomData){
+        //     socket.emit("invalid room")
+        //     return;
+        // }
+        // if(roomData.length === 100){
+        //     socket.emit("room full")
+        //     return;
+        // }
         socket.join(roomID)
-        // socket.to(roomID).broadcast.emit('user joined', peerID)
         const usersInThisRoom = Object.keys(io.sockets.adapter.rooms[roomID].sockets)
         console.log(usersInThisRoom)
-        socket.to(roomID).broadcast.emit("all users", usersInThisRoom);
-        // socket.emit("all users", usersInThisRoom);
+        io.to(socket.id).emit("all users", usersInThisRoom);
     })
 
     socket.on("sending signal", payload => {
         console.log("sending signal")
-        io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
+        io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, id: payload.callerID });
     });
 
     socket.on("returning signal", payload => {
