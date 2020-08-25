@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         console.log("disconnect " + socket.id)
-        // socket.broadcast.to(room).emit("")
+        socket.broadcast.to(socket.roomID).emit("disconnected", socket.id)
     })
 })
 

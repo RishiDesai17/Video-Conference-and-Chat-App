@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
-import io from "socket.io-client";
 
 interface Props {
     socket: SocketIOClient.Socket
+    close: () => void
 }
 
 interface Chat {
@@ -10,7 +10,7 @@ interface Chat {
     message: string
 }
 
-const ChatBox: React.FC<Props> = ({ socket }) => {
+const ChatBox: React.FC<Props> = ({ socket, close }) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [chats, setChats] = useState<Array<Chat>>([])
 
@@ -30,8 +30,9 @@ const ChatBox: React.FC<Props> = ({ socket }) => {
     })
 
     return(
-        <>
+        <div id="chatbox">
             <h1>Chat</h1>
+            <button onClick={close}>CLOSE</button>
             {chats.map(chat => (
                 <div>
                     <h1>{chat.sender}</h1>
@@ -40,7 +41,7 @@ const ChatBox: React.FC<Props> = ({ socket }) => {
             ))}
             <input ref={inputRef} />
             <button onClick={sendMessage}>SEND</button>
-        </>
+        </div>
     )
 }
 

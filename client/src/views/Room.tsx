@@ -11,7 +11,7 @@ import clsx from 'clsx';
 import { Drawer } from "@material-ui/core";
 import './styles/Room.css';
 
-interface PeersRef {
+interface Peers {
     peerID: string,
     peer: Peer.Instance
 }
@@ -26,7 +26,7 @@ interface Message {
     message: string
 }
 
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,10 +35,10 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawer: {
       width: drawerWidth,
-      flexShrink: 0,
+      flexShrink: 0
     },
     drawerPaper: {
-      width: drawerWidth,
+      width: drawerWidth
     },
     content: {
       flexGrow: 1,
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme: Theme) =>
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
-      marginRight: -drawerWidth,
+      marginRight: -drawerWidth
     },
     contentShift: {
       transition: theme.transitions.create('margin', {
@@ -63,8 +63,8 @@ const Room: React.FC = (props) => {
     const userVideo = useRef<HTMLVideoElement>(document.createElement('video'))
     const userStream = useRef<MediaStream>()
     const socketRef = useRef<SocketIOClient.Socket>(io.Socket)
-    const [peers, setPeers] = useState<Array<Peer.Instance>>([])
-    const peersRef = useRef<Array<PeersRef>>([])
+    const [peers, setPeers] = useState<Array<Peers>>([])
+    const peersRef = useRef<Array<Peers>>([])
     const [showChat, setShowChat] = useState<boolean>(false)
     const [open, setOpen] = useState(false);
     const context = useContext(Context)
@@ -109,14 +109,15 @@ const Room: React.FC = (props) => {
         }
         setShowChat(true)
         socketRef.current.on("all users", (users: string[]) => {
-            const peers = users.reduce((result: Peer.Instance[], userID: string) => {
+            const peers = users.reduce((result: Peers[], userID: string) => {
                 if(userID !== socketRef.current.id){
                     const peer = createPeer(userID, socketRef.current.id, stream);
-                    peersRef.current.push({
+                    const peerObj = {
                         peerID: userID,
                         peer
-                    })
-                    result.push(peer)
+                    }
+                    peersRef.current.push(peerObj)
+                    result.push(peerObj)
                 }
                 return result
             }, [])
@@ -128,22 +129,25 @@ const Room: React.FC = (props) => {
             console.log("user joined")
             const { signal, id } = payload
             const peer = addPeer(signal, id, stream)
-            peersRef.current.push({
+            const peerObj = {
                 peerID: id,
                 peer
-            })
-            setPeers((peers) => [...peers, peer])
+            }
+            peersRef.current.push(peerObj)
+            setPeers(peers => [...peers, peerObj])
         })
 
         socketRef.current.on("receiving returned signal", (payload: Payload) => {
             console.log("receiving returned signal")
             const { signal, id } = payload
-            const item = peersRef.current.find((p: PeersRef) => p.peerID === id);
+            const item = peersRef.current.find((p: Peers) => p.peerID === id);
             if(item){
                 item.peer.signal(signal)
             }
         })
-
+        socketRef.current.on("disconnected", (id: string) =>{
+            disconnected(id)
+        })
     }, [])
 
     const createPeer = (userToSignal: string, callerID: string, stream: MediaStream) => {
@@ -183,9 +187,15 @@ const Room: React.FC = (props) => {
             track.stop();
         });
     }
+
+    const disconnected = (id: string) => {
+        alert(id + "left the chat")
+        peersRef.current = peersRef.current.filter(peer => peer.peerID !== id)
+        setPeers(peers.filter(peer => peer.peerID !== id))
+    }
     
     return(
-        <div style={{display: 'flex'}}>
+        <div className={classes.root}>
             <main
                 className={clsx(classes.content, {
                     [classes.contentShift]: open,
@@ -193,10 +203,10 @@ const Room: React.FC = (props) => {
             >
                 <div id="video-grid">
                     {peers.map((peer) => (
-                        <Video peer={peer} />
+                        <Video peer={peer.peer} />
                     ))}
                 </div>
-                {showChat && <button onClick={() => setOpen(!open)}>open</button>}
+                {showChat && <button style={{zIndex: 1001}} onClick={() => setOpen(!open)}>open</button>}
                 <button onClick={exit}>LEAVE</button>
                 <div id="self-video">
                     <video autoPlay playsInline ref={userVideo} />
@@ -211,7 +221,7 @@ const Room: React.FC = (props) => {
                     paper: classes.drawerPaper,
                 }}
             >
-                <ChatBox socket={socketRef.current} />
+                <ChatBox socket={socketRef.current} close={() => setOpen(false)} />
             </Drawer>}
         </div>
     )
