@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import './styles/ChatBox.css'
 
 interface Props {
     socket: SocketIOClient.Socket

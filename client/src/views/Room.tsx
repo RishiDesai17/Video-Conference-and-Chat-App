@@ -9,6 +9,10 @@ import ChatBox from "../components/ChatBox";
 import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { Drawer } from "@material-ui/core";
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import IconButton from '@material-ui/core/IconButton';
 import './styles/Room.css';
 
 interface Peers {
@@ -33,21 +37,55 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       display: 'flex',
     },
+    appBar: {
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+    },
+    appBarShift: {
+      width: `calc(100% - ${drawerWidth}px)`,
+      transition: theme.transitions.create(['margin', 'width'], {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginRight: drawerWidth,
+      [theme.breakpoints.down('xs')]: {
+        marginRight: '100%'
+      },
+    },
+    title: {
+      flexGrow: 1,
+    },
+    hide: {
+      display: 'none',
+    },
     drawer: {
       width: drawerWidth,
-      flexShrink: 0
+      flexShrink: 0,
     },
     drawerPaper: {
-      width: drawerWidth
+      width: drawerWidth,
+      [theme.breakpoints.down('xs')]: {
+        width: '100%'
+      },
+    },
+    drawerHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      ...theme.mixins.toolbar,
+      justifyContent: 'flex-start',
     },
     content: {
       flexGrow: 1,
-      padding: theme.spacing(3),
       transition: theme.transitions.create('margin', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
-      marginRight: -drawerWidth
+      marginRight: -drawerWidth,
+      [theme.breakpoints.down('xs')]: {
+        width: 0
+      },
     },
     contentShift: {
       transition: theme.transitions.create('margin', {
@@ -196,11 +234,36 @@ const Room: React.FC = (props) => {
     
     return(
         <div className={classes.root}>
+            <CssBaseline />
+            <AppBar
+                position="fixed"
+                className={clsx(classes.appBar, {
+                [classes.appBarShift]: open,
+                })}
+                style={{height: 50}}
+            >
+                <Toolbar>
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        edge="end"
+                        onClick={() => setOpen(true)}
+                        className={clsx(open && classes.hide)}
+                        style={{ position: 'absolute', right: 20, top: 1 }}
+                    >
+                        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M2 1h12a1 1 0 0 1 1 1v11.586l-2-2A2 2 0 0 0 11.586 11H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm12-1a2 2 0 0 1 2 2v12.793a.5.5 0 0 1-.854.353l-2.853-2.853a1 1 0 0 0-.707-.293H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12z"/>
+                            <path fill-rule="evenodd" d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                        </svg>
+                    </IconButton>
+                </Toolbar>
+            </AppBar>
             <main
                 className={clsx(classes.content, {
                     [classes.contentShift]: open,
                 })}
             >
+                <div className={classes.drawerHeader} />
                 <div id="video-grid">
                     {peers.map((peer) => (
                         <Video peer={peer.peer} />
@@ -212,7 +275,7 @@ const Room: React.FC = (props) => {
                     <video autoPlay playsInline ref={userVideo} />
                 </div>
             </main>
-            {showChat && <Drawer
+             <Drawer
                 className={classes.drawer}
                 variant="persistent"
                 anchor="right"
@@ -221,8 +284,8 @@ const Room: React.FC = (props) => {
                     paper: classes.drawerPaper,
                 }}
             >
-                <ChatBox socket={socketRef.current} close={() => setOpen(false)} />
-            </Drawer>}
+                {showChat && <ChatBox socket={socketRef.current} close={() => setOpen(false)} />}
+            </Drawer>
         </div>
     )
 }
