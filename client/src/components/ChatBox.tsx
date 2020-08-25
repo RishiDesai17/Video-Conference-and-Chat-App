@@ -2,8 +2,7 @@ import React, { useRef, useState } from 'react';
 import io from "socket.io-client";
 
 interface Props {
-    socket: SocketIOClient.Socket,
-    roomID: string
+    socket: SocketIOClient.Socket
 }
 
 interface Chat {
@@ -11,14 +10,14 @@ interface Chat {
     message: string
 }
 
-const ChatBox: React.FC<Props> = ({ socket, roomID }) => {
+const ChatBox: React.FC<Props> = ({ socket }) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [chats, setChats] = useState<Array<Chat>>([])
 
     const sendMessage = () => {
         if(inputRef.current && inputRef.current?.value !== ""){
             const val = inputRef.current?.value
-            socket.emit("message", {message: val, roomID})
+            socket.emit("message", val)
             setChats([...chats, {
                 sender: socket.id,
                 message: val

@@ -15,7 +15,7 @@ const Video: React.FC<Props> = (props) => {
     }, []);
 
     return (
-        <video autoPlay playsInline ref={ref} />
+        <video autoPlay playsInline className="peer-video" ref={ref} />
     );
 }
 

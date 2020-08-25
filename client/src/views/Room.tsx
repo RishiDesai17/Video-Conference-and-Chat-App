@@ -5,8 +5,11 @@ import { useHistory } from 'react-router-dom';
 import * as queryString from 'query-string';
 import Video from '../components/Video';
 import { Context } from "../context/Context";
-import './styles/Room.css';
 import ChatBox from "../components/ChatBox";
+import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
+import clsx from 'clsx';
+import { Drawer } from "@material-ui/core";
+import './styles/Room.css';
 
 interface PeersRef {
     peerID: string,
@@ -23,16 +26,50 @@ interface Message {
     message: string
 }
 
+const drawerWidth = 240;
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      display: 'flex',
+    },
+    drawer: {
+      width: drawerWidth,
+      flexShrink: 0,
+    },
+    drawerPaper: {
+      width: drawerWidth,
+    },
+    content: {
+      flexGrow: 1,
+      padding: theme.spacing(3),
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      marginRight: -drawerWidth,
+    },
+    contentShift: {
+      transition: theme.transitions.create('margin', {
+        easing: theme.transitions.easing.easeOut,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      marginRight: 0,
+    },
+  }),
+);
+
 const Room: React.FC = (props) => {
     const userVideo = useRef<HTMLVideoElement>(document.createElement('video'))
     const userStream = useRef<MediaStream>()
     const socketRef = useRef<SocketIOClient.Socket>(io.Socket)
-    const room = useRef<string>("")
     const [peers, setPeers] = useState<Array<Peer.Instance>>([])
     const peersRef = useRef<Array<PeersRef>>([])
     const [showChat, setShowChat] = useState<boolean>(false)
+    const [open, setOpen] = useState(false);
     const context = useContext(Context)
     const history = useHistory()
+    const classes = useStyles();
 
     useEffect(() => {
         init()
@@ -48,8 +85,6 @@ const Room: React.FC = (props) => {
             socketRef.current.emit("start meet")
             socketRef.current.on("roomID", (roomID: string) => {
                 console.log(roomID)
-                room.current = roomID
-                setShowChat(true)
             })
         }
         else{
@@ -60,8 +95,6 @@ const Room: React.FC = (props) => {
                 exit()
                 return;
             }
-            room.current = queryParams.room
-            setShowChat(true)
             socketRef.current.emit("join room", queryParams.room)
             socketRef.current.on("invalid room", () => {
                 alert("Invalid room")
@@ -74,6 +107,7 @@ const Room: React.FC = (props) => {
                 return;
             })
         }
+        setShowChat(true)
         socketRef.current.on("all users", (users: string[]) => {
             const peers = users.reduce((result: Peer.Instance[], userID: string) => {
                 if(userID !== socketRef.current.id){
@@ -151,15 +185,35 @@ const Room: React.FC = (props) => {
     }
     
     return(
-        <>
-            <div id="video-grid">
-                <video autoPlay playsInline ref={userVideo} />
-                {peers.map((peer) => (
-                    <Video peer={peer} />
-                ))}
-            </div>
-            {showChat && <ChatBox socket={socketRef.current} roomID={room.current} />}
-        </>
+        <div style={{display: 'flex'}}>
+            <main
+                className={clsx(classes.content, {
+                    [classes.contentShift]: open,
+                })}
+            >
+                <div id="video-grid">
+                    {peers.map((peer) => (
+                        <Video peer={peer} />
+                    ))}
+                </div>
+                {showChat && <button onClick={() => setOpen(!open)}>open</button>}
+                <button onClick={exit}>LEAVE</button>
+                <div id="self-video">
+                    <video autoPlay playsInline ref={userVideo} />
+                </div>
+            </main>
+            {showChat && <Drawer
+                className={classes.drawer}
+                variant="persistent"
+                anchor="right"
+                open={open}
+                classes={{
+                    paper: classes.drawerPaper,
+                }}
+            >
+                <ChatBox socket={socketRef.current} />
+            </Drawer>}
+        </div>
     )
 }
 

@@ -8,3 +8,10 @@ video{
     height: 100%;
     object-fit: cover;
 }
+#self-video{
+    position: absolute;
+    width: 15vw;
+    height: 15vh;
+    bottom: 3vh;
+    right: 3vh;
+}
