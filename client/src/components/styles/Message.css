@@ -1,0 +1,18 @@
+.messageContainer{
+    max-width: 70%;
+    min-width: 5%;
+    min-height: 20px;
+    word-break: break-all;
+    margin: 5px;
+}
+#messageContent{
+    margin: 5px;
+}
+#recdMessage{
+    background-color: lightblue;
+    text-align: left;
+}
+#userMessage{
+    background-color: lightgreen;
+    text-align: right;
+}

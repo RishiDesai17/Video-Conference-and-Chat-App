@@ -1,4 +1,5 @@
 import React from 'react';
+import './styles/Message.css';
 
 interface Message {
     sender: string,
@@ -6,14 +7,19 @@ interface Message {
 }
 
 interface Props {
-    chat: Message
+    chat: Message,
+    socketID: string
 }
 
-const Message: React.FC<Props> = ({ chat }) => {
+const Message: React.FC<Props> = ({ chat, socketID }) => {
+    const { sender, message } = chat
+
     return(
-        <div>
-            <h1>{chat.sender}</h1>
-            <p>{chat.message}</p>
+        <div className="messageContainer" id={socketID === sender ? "userMessage" : "recdMessage"}>
+            <div id="messageContent">
+                <b>{sender}</b>
+                <p>{message}</p>
+            </div>
         </div>
     )
 }

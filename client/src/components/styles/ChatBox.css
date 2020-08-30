@@ -1,8 +1,19 @@
 #chatbox{
     background-color: #dbdbdb;
-    height: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+#messagesContainer{
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 90%;
 }
 #input{
     position: absolute;
-    margin-bottom: 20px;
+    bottom: 5px;
+}
+#backArrow {
+    text-align: left;
+    margin-top: 10px;
+    cursor: pointer;
 }

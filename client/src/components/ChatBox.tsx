@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, MouseEvent } from 'react';
 import Message from "./Message";
 import './styles/ChatBox.css'
 
@@ -16,7 +16,9 @@ const ChatBox: React.FC<Props> = ({ socket, close }) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [chats, setChats] = useState<Array<Chat>>([])
 
-    const sendMessage = () => {
+    const sendMessage = (e: MouseEvent) => {
+        e.preventDefault()
+        console.log("send")
         if(inputRef.current && inputRef.current?.value !== ""){
             const val = inputRef.current?.value
             socket.emit("message", val)
@@ -25,27 +27,38 @@ const ChatBox: React.FC<Props> = ({ socket, close }) => {
                 message: val
             }
             addToChat(chatObj)
+            inputRef.current.value = ""
         }
     }
 
     const addToChat = useCallback((chatObj: Chat) => {
-        setChats([...chats, chatObj])
+        console.log("add")
+        setChats(chats => [...chats, chatObj])
     }, [])
 
     socket.on("receiveMsg", (payload: Chat) => {
-        setChats([...chats, payload])
+        console.log("recd")
+        addToChat(payload)
     })
 
     return(
         <div id="chatbox">
-            <h1>Chat</h1>
-            <button onClick={close}>CLOSE</button>
-            {chats.map((chat, index) => (
-                <Message key={index} chat={chat} />
-            ))}
+            {/* <h1>Chat</h1> */}
+            <div id="backArrow" onClick={close}>
+                <svg width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
+                </svg>
+            </div>
+            <div id="messagesContainer">
+                {chats.map((chat, index) => (
+                    <Message key={index} chat={chat} socketID={socket.id} />
+                ))}
+            </div>
             <div id="input">
-                <input ref={inputRef} />
-                <button onClick={sendMessage}>SEND</button>
+                <form>
+                    <input ref={inputRef} />
+                    <button type="submit" onClick={(e) => sendMessage(e)}>SEND</button>
+                </form>
             </div>
         </div>
     )
