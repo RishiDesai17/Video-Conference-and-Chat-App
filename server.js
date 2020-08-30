@@ -33,7 +33,7 @@ io.on("connection", (socket) => {
             socket.emit("invalid room")
             return;
         }
-        if(roomData.length === 100){
+        if(roomData.length > 100){
             socket.emit("room full")
             return;
         }

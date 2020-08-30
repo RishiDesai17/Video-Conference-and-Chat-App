@@ -6,6 +6,7 @@ import * as queryString from 'query-string';
 import Video from '../components/Video';
 import { Context } from "../context/Context";
 import ChatBox from "../components/ChatBox";
+import Controls from '../components/Controls'
 import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { Drawer } from "@material-ui/core";
@@ -23,11 +24,6 @@ interface Peers {
 interface Payload {
     signal: any,
     id: string
-}
-
-interface Message {
-    sender: string,
-    message: string
 }
 
 const drawerWidth = 300;
@@ -123,6 +119,7 @@ const Room: React.FC = (props) => {
             socketRef.current.emit("start meet")
             socketRef.current.on("roomID", (roomID: string) => {
                 console.log(roomID)
+                window.history.replaceState("", "", `?room=${roomID}`);
             })
         }
         else{
@@ -167,12 +164,12 @@ const Room: React.FC = (props) => {
             console.log("user joined")
             const { signal, id } = payload
             const peer = addPeer(signal, id, stream)
-            const peerObj = {
+            const peerObj: Peers = {
                 peerID: id,
                 peer
             }
             peersRef.current.push(peerObj)
-            setPeers(peers => [...peers, peerObj])
+            addPeerVideo(peerObj)
         })
 
         socketRef.current.on("receiving returned signal", (payload: Payload) => {
@@ -218,6 +215,14 @@ const Room: React.FC = (props) => {
         return peer
     }
 
+    const addPeerVideo = useCallback((peerObj: Peers) => {
+        setPeers(peers => [...peers, peerObj])
+    }, [])
+
+    const removePeerVideo = useCallback((id: string) => {
+        setPeers(peers => peers.filter(peer => peer.peerID !== id))
+    }, [])
+
     const exit = () => {
         socketRef.current.disconnect()
         history.replace("/")
@@ -229,7 +234,7 @@ const Room: React.FC = (props) => {
     const disconnected = (id: string) => {
         alert(id + "left the chat")
         peersRef.current = peersRef.current.filter(peer => peer.peerID !== id)
-        setPeers(peers.filter(peer => peer.peerID !== id))
+        removePeerVideo(id)
     }
     
     return(
@@ -251,10 +256,10 @@ const Room: React.FC = (props) => {
                         className={clsx(open && classes.hide)}
                         style={{ position: 'absolute', right: 20, top: 1 }}
                     >
-                        <svg width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        {showChat && <svg width="1em" height="1em" viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" d="M2 1h12a1 1 0 0 1 1 1v11.586l-2-2A2 2 0 0 0 11.586 11H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm12-1a2 2 0 0 1 2 2v12.793a.5.5 0 0 1-.854.353l-2.853-2.853a1 1 0 0 0-.707-.293H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12z"/>
                             <path fill-rule="evenodd" d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
-                        </svg>
+                        </svg>}
                     </IconButton>
                 </Toolbar>
             </AppBar>
@@ -265,12 +270,13 @@ const Room: React.FC = (props) => {
             >
                 <div className={classes.drawerHeader} />
                 <div id="video-grid">
-                    {peers.map((peer) => (
-                        <Video peer={peer.peer} />
+                    {peers.map((peer, index) => (
+                        <Video key={index} peer={peer.peer} />
                     ))}
                 </div>
-                {showChat && <button style={{zIndex: 1001}} onClick={() => setOpen(!open)}>open</button>}
-                <button onClick={exit}>LEAVE</button>
+                <div id="controls-box">
+                    <Controls exit={exit} />
+                </div>
                 <div id="self-video">
                     <video autoPlay playsInline ref={userVideo} />
                 </div>

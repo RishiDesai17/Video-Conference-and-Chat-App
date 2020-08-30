@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
+import Message from "./Message";
 import './styles/ChatBox.css'
 
 interface Props {
@@ -19,12 +20,17 @@ const ChatBox: React.FC<Props> = ({ socket, close }) => {
         if(inputRef.current && inputRef.current?.value !== ""){
             const val = inputRef.current?.value
             socket.emit("message", val)
-            setChats([...chats, {
+            const chatObj = {
                 sender: socket.id,
                 message: val
-            }])
+            }
+            addToChat(chatObj)
         }
     }
+
+    const addToChat = useCallback((chatObj: Chat) => {
+        setChats([...chats, chatObj])
+    }, [])
 
     socket.on("receiveMsg", (payload: Chat) => {
         setChats([...chats, payload])
@@ -34,14 +40,13 @@ const ChatBox: React.FC<Props> = ({ socket, close }) => {
         <div id="chatbox">
             <h1>Chat</h1>
             <button onClick={close}>CLOSE</button>
-            {chats.map(chat => (
-                <div>
-                    <h1>{chat.sender}</h1>
-                    <p>{chat.message}</p>
-                </div>
+            {chats.map((chat, index) => (
+                <Message key={index} chat={chat} />
             ))}
-            <input ref={inputRef} />
-            <button onClick={sendMessage}>SEND</button>
+            <div id="input">
+                <input ref={inputRef} />
+                <button onClick={sendMessage}>SEND</button>
+            </div>
         </div>
     )
 }
