@@ -57,8 +57,7 @@ io.on("connection", (socket) => {
 
     socket.on("message", (message) => {
         console.log(message, socket.roomID)
-        console.log(Object.keys(io.sockets.adapter.rooms[socket.roomID].sockets))
-        socket.broadcast.to(socket.roomID).emit('receiveMsg', { sender: socket.id, message });
+        socket.broadcast.to(socket.roomID).emit('receive-message', { sender: socket.id, message });
     })
 
     socket.on("disconnect", () => {

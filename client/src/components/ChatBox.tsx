@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, MouseEvent } from 'react';
+import React, { useRef, useState, useCallback, useEffect, MouseEvent } from 'react';
 import Message from "./Message";
 import './styles/ChatBox.css'
 
@@ -15,6 +15,13 @@ interface Chat {
 const ChatBox: React.FC<Props> = ({ socket, close }) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [chats, setChats] = useState<Array<Chat>>([])
+
+    useEffect(() => {
+        socket.on("receive-message", (payload: Chat) => {
+            console.log("recd")
+            addToChat(payload)
+        })
+    }, [])
 
     const sendMessage = (e: MouseEvent) => {
         e.preventDefault()
@@ -35,11 +42,6 @@ const ChatBox: React.FC<Props> = ({ socket, close }) => {
         console.log("add")
         setChats(chats => [...chats, chatObj])
     }, [])
-
-    socket.on("receiveMsg", (payload: Chat) => {
-        console.log("recd")
-        addToChat(payload)
-    })
 
     return(
         <div id="chatbox">
