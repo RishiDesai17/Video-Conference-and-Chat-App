@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import './styles/Message.css';
 
 interface Message {
@@ -14,10 +14,14 @@ interface Props {
 const Message: React.FC<Props> = ({ chat, socketID }) => {
     const { sender, message } = chat
 
+    const sentByMe = useMemo(() => {
+        return socketID === sender
+    }, [])
+
     return(
-        <div className="messageContainer" id={socketID === sender ? "userMessage" : "recdMessage"}>
+        <div className="messageContainer" id={sentByMe ? "userMessage" : "recdMessage"}>
             <div id="messageContent">
-                <b>{sender}</b>
+                {!sentByMe && <b>{sender}</b>}
                 <p>{message}</p>
             </div>
         </div>

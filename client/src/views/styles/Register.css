@@ -1,0 +1,42 @@
+#inner-register-container {
+    background-color: #FFCC99;
+    border-radius: 5px;
+    border: 1px solid #8B4513;
+    width: 23.75rem;
+    -ms-transform: translateY(-5.5vh);
+    transform: translateY(-5.5vh);
+}
+
+#registerTitle {
+    color: #8B4513;
+    font-size: 2.2em;
+}
+
+.inputs-with-label{
+    margin-bottom: 2px !important;
+}
+
+.invalid {
+    border: 1.5px solid red
+}
+
+.validation-message {
+    text-align: left;
+    color: red
+}
+
+.invisible {
+    display: none;
+}
+
+#register-button {
+    background-color: #8B4513;
+    color: white;
+    margin-top: 2.2rem;
+}
+
+@media screen and (max-width: 400px) {
+    #inner-register-container {
+        width: 90vw;
+    }
+}

@@ -1,16 +1,21 @@
-#loginContainer {
+#login-container {
     display: flex;
     flex: 1;
     justify-content: center;
-    -ms-transform: translateY(35%);
-    transform: translateY(35%);
+    -ms-transform: translateY(16vh);
+    transform: translateY(16vh);
 }
 
-#innerLoginContainer {
+#inner-login-container {
     background-color: #abc2e8;
     border-radius: 5px;
     border: 1px solid #273a4d;
     width: 23.75rem;
+}
+
+#loginTitle {
+    color: #273a4d;
+    font-size: 2.2em;
 }
 
 .inputs {
@@ -24,16 +29,22 @@
     background-color: #273a4d;
     color: white;
     margin-top: 2.2rem;
+}
+
+#login-register {
     margin-bottom: 2.7rem;
 }
 
-#loginTitle {
-    color: #273a4d;
-    font-size: 2.2em;
+#login-register-link {
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 @media screen and (max-width: 400px) {
-    #innerLoginContainer {
+    #inner-login-container {
         width: 90vw;
+    }
+    .inputs{
+        width: 80%;
     }
 }
