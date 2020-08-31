@@ -9,6 +9,10 @@ const uuid = require('uuid');
 
 app.use(express.json())
 
+const userRoutes = require('./routes/users');
+
+app.use('/api/users', userRoutes);
+
 app.use(cors())
 
 io.on("connection", (socket) => {
