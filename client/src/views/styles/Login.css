@@ -1,0 +1,39 @@
+#loginContainer {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    -ms-transform: translateY(35%);
+    transform: translateY(35%);
+}
+
+#innerLoginContainer {
+    background-color: #abc2e8;
+    border-radius: 5px;
+    border: 1px solid #273a4d;
+    width: 23.75rem;
+}
+
+.inputs {
+    width: 17.5rem;
+    height: 2.2rem;
+    font-size: 1rem;
+    margin: 1.2rem;
+}
+
+#loginButton {
+    background-color: #273a4d;
+    color: white;
+    margin-top: 2.2rem;
+    margin-bottom: 2.7rem;
+}
+
+#loginTitle {
+    color: #273a4d;
+    font-size: 2.2em;
+}
+
+@media screen and (max-width: 400px) {
+    #innerLoginContainer {
+        width: 90vw;
+    }
+}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Container } from '@material-ui/core';
 import './styles/Controls.css';
 
 interface Props {
@@ -18,6 +19,7 @@ const Controls: React.FC<Props> = ({ exit }) => {
     }
 
     return(
+        <Container>
         <div id="controls-container">
             <div className="controls" onClick={audioHandler}>
                 {audio ? 
@@ -48,6 +50,7 @@ const Controls: React.FC<Props> = ({ exit }) => {
                 </svg>
             </div>
         </div>
+        </Container>
     )
 }
 

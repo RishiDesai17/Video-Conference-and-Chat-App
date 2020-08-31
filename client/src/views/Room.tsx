@@ -9,11 +9,7 @@ import ChatBox from "../components/ChatBox";
 import Controls from '../components/Controls'
 import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
-import { Drawer } from "@material-ui/core";
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import IconButton from '@material-ui/core/IconButton';
+import { Drawer, Container, AppBar, Toolbar, CssBaseline, IconButton } from "@material-ui/core";
 import './styles/Room.css';
 
 interface Peers {
@@ -274,9 +270,11 @@ const Room: React.FC = (props) => {
                         <Video key={index} peer={peer.peer} />
                     ))}
                 </div>
+                <Container>
                 <div id="controls-box">
                     <Controls exit={exit} />
                 </div>
+                </Container>
                 <div id="self-video">
                     <video autoPlay playsInline ref={userVideo} />
                 </div>
