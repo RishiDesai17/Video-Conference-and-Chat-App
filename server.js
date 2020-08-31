@@ -8,6 +8,7 @@ const io = socket(server)
 const uuid = require('uuid');
 
 app.use(express.json())
+
 app.use(cors())
 
 io.on("connection", (socket) => {
