@@ -1,4 +1,5 @@
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken')
 const { generateTokens } = require('../utils/token');
 const User = require('../models/user')
 
@@ -76,6 +77,41 @@ exports.logout = (req, res) => {
     catch(err){
         return res.status(500).json({
             message: 'Something went wrong'
+        })
+    }
+}
+
+exports.refresh = async(req, res) => {
+    try{
+        if(!req.cookies.refresh_token_video_conf){
+            return res.status(401).json({
+                message: 'Authorization failed'
+            })
+        }
+        const { id, name } = jwt.verify(req.cookies.refresh_token_video_conf, process.env.REFRESHTOKENKEY)
+        const access_token = jwt.sign({ id, name }, process.env.SECRETKEY, {
+            expiresIn: '600s'
+        })
+        if(req.body.getprofile){
+            const profile = await User.findById(id)
+            if(profile === null){
+                return res.json({
+                    message: 'Account Not Found'
+                })
+            }
+            return res.status(200).json({
+                profile,
+                access_token
+            })
+        }
+        return res.status(200).json({
+            access_token
+        })
+    }
+    catch(err){
+        console.log(err)
+        return res.status(401).json({
+            message: 'Authorization failed'
         })
     }
 }

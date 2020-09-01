@@ -1,5 +1,6 @@
 import React, { useRef, useCallback, MouseEvent } from "react";
 import { Button } from '@material-ui/core';
+import axios from 'axios';
 import './styles/Register.css';
 
 interface Props {
@@ -13,16 +14,38 @@ const Signup: React.FC<Props> = ({ switchHandler }) => {
     const emailRef = useRef<string>("")
     const passwordRef = useRef<string>("")
 
-    const register = useCallback(async(e: MouseEvent) => {
-        if(regexMatch("name", nameRef.current) && regexMatch("email", emailRef.current) && regexMatch("password", passwordRef.current)){
-            
+    const register = async(e: MouseEvent) => {
+        e.preventDefault()
+        try{
+            if(registerValidation()){
+                const response = await axios.post('api/users/register', 
+                    JSON.stringify({
+                        name: nameRef.current,
+                        email: emailRef.current,
+                        password: passwordRef.current
+                    }),
+                    {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                )
+                console.log(response.data)
+            }
+            else{
+                alert("Fill the given fields appropriately")
+            }
         }
-        else{
-            
+        catch(err){
+            console.log(err)
         }
+    }
+
+    const registerValidation = useCallback(() => {
+        return (regexMatch("name", nameRef.current) && regexMatch("email", emailRef.current) && regexMatch("password", passwordRef.current))
     }, [])
 
-    const regexMatch = (field: Field, val: string) => {
+    const regexMatch = useCallback((field: Field, val: string) => {
         if(field === "name"){
             const regex = /^(?!\s*$)[A-Za-z ]*$/
             return val.trim().match(regex)
@@ -35,9 +58,9 @@ const Signup: React.FC<Props> = ({ switchHandler }) => {
             const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/
             return val.trim().match(regex)
         }
-    }
+    }, [])
 
-    const validation = (field: Field, val: string) => {
+    const validation = useCallback((field: Field, val: string) => {
         const input = document.getElementById(field+"-input")
         if(field === "name") {
             if(regexMatch(field, val)) {
@@ -75,7 +98,7 @@ const Signup: React.FC<Props> = ({ switchHandler }) => {
                 input?.classList.add('inputs-with-label')
             }
         }
-    }
+    }, [])
 
     return(
         <div id="inner-register-container">

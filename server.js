@@ -2,11 +2,23 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const http = require('http')
+const morgan = require('morgan')
+const mongoose = require('mongoose')
 const socket = require('socket.io')
 const server = http.createServer(app)
 const io = socket(server)
 const uuid = require('uuid');
+require('dotenv').config({ path: __dirname + '/.env' })
+const { createMeet } = require('./controllers/meets')
 
+mongoose.connect(process.env.DBURL, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+});
+  
+mongoose.Promise = global.Promise;
+
+app.use(morgan('dev'))
 app.use(express.json())
 
 const userRoutes = require('./routes/users');
@@ -24,6 +36,7 @@ io.on("connection", (socket) => {
         socket.join(roomID)
         socket.roomID = roomID
         io.to(socket.id).emit("roomID", roomID)
+        // createMeet(roomID, )
         // console.log(Object.keys(io.sockets.adapter.sids[socket.id]))
     })
 

@@ -1,23 +1,28 @@
-import React, { useState, useRef, useCallback, MouseEvent } from "react";
+import React, { useState, useRef, useCallback, useContext, MouseEvent } from "react";
 import { Button } from '@material-ui/core';
 import Register from "./Register";
+import { Context } from '../context/Context';
+import axios from 'axios';
 import "./styles/Login.css";
 
 const Login: React.FC = () => {
     const [showLogin, setShowLogin] = useState<boolean>(true)
-    const emailRef = useRef<HTMLInputElement>(null)
-    const passwordRef = useRef<HTMLInputElement>(null)
+    const { login } = useContext(Context)
+    const emailRef = useRef<string>("")
+    const passwordRef = useRef<string>("")
 
-    const login = useCallback(async(e: MouseEvent) => {
+    const loginHandler = useCallback((e: MouseEvent) => {
         e.preventDefault()
-        if(emailRef.current && passwordRef.current && emailRef.current?.value !== "" && passwordRef.current?.value !== ""){
-            const email = emailRef.current?.value
-            const password = passwordRef.current?.value
-
+        if(loginValidation()){
+            login(emailRef.current, passwordRef.current)
         }
         else{
             alert("Please fill in both the fields")
         }
+    }, [])
+
+    const loginValidation = useCallback(() => {
+        return (emailRef.current !== "" && passwordRef.current !== "")
     }, [])
 
     const switchHandler = useCallback((bool: boolean) => {
@@ -30,9 +35,13 @@ const Login: React.FC = () => {
                 <div id="inner-login-container">
                     <p id="loginTitle">LOGIN</p>
                     <form>
-                        <input type="text" className="inputs" placeholder="Email ID" ref={emailRef} />
-                        <input type="password" className="inputs" placeholder="Password" />
-                        <Button variant="contained" color="inherit" id="loginButton" onClick={(e) => login(e)}>
+                        <input type="text" className="inputs" placeholder="Email ID" onChange={e => {
+                            emailRef.current = e.target.value
+                        }} />
+                        <input type="password" className="inputs" placeholder="Password" onChange={e => {
+                            passwordRef.current = e.target.value
+                        }} />
+                        <Button variant="contained" color="inherit" id="loginButton" onClick={(e) => loginHandler(e)}>
                             Login
                         </Button>
                         <p id="login-register">Don't have an account? <b id="login-register-link" onClick={() => switchHandler(false)}>Register</b></p>

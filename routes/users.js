@@ -9,4 +9,6 @@ router.post('/register', UsersController.register)
 
 router.get('/logout', UsersController.logout)
 
+router.post('/refresh', UsersController.refresh)
+
 module.exports = router
