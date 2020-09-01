@@ -11,7 +11,7 @@ interface STATE {
 interface CONTEXT {
     state: STATE,
     init: (getprofile: boolean) => void,
-    login: (email: string, password: string) => void,
+    login: (email: string, password: string) => Promise<boolean>,
     meetHandler: (host: boolean) => void
 }
 
@@ -37,7 +37,7 @@ const INIT_STATE: STATE = {
 const CONTEXT_DEFN: CONTEXT = {
     state: INIT_STATE,
     init: () => {},
-    login: () => {},
+    login: () => Promise.resolve(true),
     meetHandler: () => {}
 }
 
@@ -48,14 +48,30 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
 
     const init = async(getprofile: boolean) => {
         try {
-            // await axios.post()
+            const response = await axios.post('api/users/refresh',
+                JSON.stringify({
+                    getprofile
+                }),
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            )
+            console.log(response.data)
             setState({
                 ...state,
-                loading: false
+                loading: false,
+                loggedIn: true,
+                profile: response.data.profile
             })
         }
         catch(err) {
             console.log(err)
+            setState({
+                ...state,
+                loading: false,
+            })
         }
     }
 
@@ -78,10 +94,12 @@ const ContextProvider: React.FC<Props> = ({ children }) => {
                 loggedIn: true,
                 profile: response.data.profile
             })
+            return true
         }
         catch(err){
             console.log(err)
             // alert
+            return false
         }
     }
 

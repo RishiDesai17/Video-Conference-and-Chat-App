@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useContext, MouseEvent } from "react";
+import { useHistory } from "react-router-dom";
 import { Button } from '@material-ui/core';
 import Register from "./Register";
 import { Context } from '../context/Context';
@@ -10,11 +11,15 @@ const Login: React.FC = () => {
     const { login } = useContext(Context)
     const emailRef = useRef<string>("")
     const passwordRef = useRef<string>("")
+    const history = useHistory()
 
-    const loginHandler = useCallback((e: MouseEvent) => {
+    const loginHandler = useCallback(async(e: MouseEvent) => {
         e.preventDefault()
         if(loginValidation()){
-            login(emailRef.current, passwordRef.current)
+            const response = await login(emailRef.current, passwordRef.current)
+            if(response){
+                history.replace("/")
+            }
         }
         else{
             alert("Please fill in both the fields")

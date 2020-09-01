@@ -11,14 +11,14 @@ exports.login = async(req, res) => {
                 NOT_FOUND: 'This account does not exist'
             })
         }
-        const isValid = await bcrypt.compare(req.body.password, user.password)
+        const isValid = await bcrypt.compare(req.body.password, user[0].password)
         if(!isValid){
             return res.status(401).json({
                 UNAUTHORIZED: 'Invalid credentials'
             })
         }
-        user.password = undefined
-        const tokenpair = await generateTokens(user._id, user.name)
+        user[0].password = undefined
+        const tokenpair = await generateTokens(user[0]._id, user[0].name)
         const dt = new Date()
         res.cookie('refresh_token_video_conf', tokenpair[1], {
             httpOnly: true,
@@ -88,14 +88,16 @@ exports.refresh = async(req, res) => {
                 message: 'Authorization failed'
             })
         }
+        
         const { id, name } = jwt.verify(req.cookies.refresh_token_video_conf, process.env.REFRESHTOKENKEY)
+        console.log(id)
         const access_token = jwt.sign({ id, name }, process.env.SECRETKEY, {
             expiresIn: '600s'
         })
         if(req.body.getprofile){
             const profile = await User.findById(id)
             if(profile === null){
-                return res.json({
+                return res.status(404).json({
                     message: 'Account Not Found'
                 })
             }

@@ -4,12 +4,11 @@ import Home from './views/Home';
 import Room from './views/Room';
 import Login from './views/Login';
 import Loader from './views/Loader';
+import ProtectedRoute from './protected-route/protected-route';
 import { Context } from './context/Context';
-import axios from 'axios';
 import './App.css';
 
 const App: React.FC = () => {
-  const [initialising, setInitialising] = useState<boolean>(true)
   const { init, state } = useContext(Context)
 
   useEffect(() => {
@@ -23,8 +22,8 @@ const App: React.FC = () => {
       :
         <BrowserRouter>
           <Switch>
-            <Route exact path="/" component={Home} />
-            <Route exact path="/room" component={Room} />
+            <ProtectedRoute exact path="/" component={Home} />
+            <ProtectedRoute exact path="/room" component={Room} />
             <Route exact path="/login" component={Login} />
           </Switch>
         </BrowserRouter>

@@ -4,11 +4,13 @@ const cors = require('cors')
 const http = require('http')
 const morgan = require('morgan')
 const mongoose = require('mongoose')
+const cookieParser = require('cookie-parser');
 const socket = require('socket.io')
 const server = http.createServer(app)
 const io = socket(server)
 const uuid = require('uuid');
 require('dotenv').config({ path: __dirname + '/.env' })
+
 const { createMeet } = require('./controllers/meets')
 
 mongoose.connect(process.env.DBURL, {
@@ -20,6 +22,7 @@ mongoose.Promise = global.Promise;
 
 app.use(morgan('dev'))
 app.use(express.json())
+app.use(cookieParser())
 
 const userRoutes = require('./routes/users');
 
