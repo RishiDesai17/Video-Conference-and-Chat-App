@@ -6,10 +6,11 @@ import HeaderMaterialstyles from './styles/HeaderMaterialstyles';
 
 interface Props {
     setOpen: (open: boolean) => void,
-    showChat: boolean
+    showChat: boolean,
+    open: boolean
 }
 
-const Header: React.FC<Props> = ({ setOpen, showChat }) => {
+const Header: React.FC<Props> = ({ open, setOpen, showChat }) => {
     const classes = HeaderMaterialstyles()
 
     return(

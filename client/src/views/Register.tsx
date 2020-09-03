@@ -47,7 +47,7 @@ const Signup: React.FC<Props> = ({ switchHandler }) => {
 
     const regexMatch = useCallback((field: Field, val: string) => {
         if(field === "name"){
-            const regex = /^(?!\s*$)[A-Za-z ]*$/
+            const regex = /^[A-Za-z ]{1,25}$/
             return val.trim().match(regex)
         }
         else if(field === "email") {
@@ -110,7 +110,7 @@ const Signup: React.FC<Props> = ({ switchHandler }) => {
                         validation("name", e.target.value)
                     }} />
                     <div>
-                        <label id="name-validation-message" className="validation-message invisible" htmlFor="name-input">Enter a valid name</label>
+                        <label id="name-validation-message" className="validation-message invisible" htmlFor="name-input">Enter a valid name lesser than 25 characters</label>
                     </div>
                 </div>
                 <div className="input-container">

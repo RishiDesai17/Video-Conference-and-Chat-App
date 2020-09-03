@@ -170,7 +170,7 @@ const Room: React.FC = (props) => {
     return(
         <div className={classes.root}>
             <CssBaseline />
-            <Header setOpen={setOpen} showChat={showChat} />
+            <Header open={open} setOpen={setOpen} showChat={showChat} />
             <main
                 className={clsx(classes.content, {
                     [classes.contentShift]: open,
