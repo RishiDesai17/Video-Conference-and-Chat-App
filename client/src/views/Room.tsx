@@ -6,11 +6,12 @@ import * as queryString from 'query-string';
 import Video from '../components/Video';
 import { Context } from "../context/Context";
 import ChatBox from "../components/ChatBox";
-import Controls from '../components/Controls'
-import { makeStyles, useTheme, Theme, createStyles } from '@material-ui/core/styles';
+import Controls from '../components/Controls';
+import Header from '../components/Header';
 import clsx from 'clsx';
-import { Drawer, Container, AppBar, Toolbar, CssBaseline, IconButton } from "@material-ui/core";
+import { Drawer, Container, CssBaseline } from "@material-ui/core";
 import './styles/Room.css';
+import RoomMaterialStyles from './styles/RoomMaterialstyles';
 
 interface Peers {
     peerID: string,
@@ -22,73 +23,6 @@ interface Payload {
     id: string
 }
 
-const drawerWidth = 300;
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      display: 'flex',
-    },
-    appBar: {
-      transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-    },
-    appBarShift: {
-      width: `calc(100% - ${drawerWidth}px)`,
-      transition: theme.transitions.create(['margin', 'width'], {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginRight: drawerWidth,
-      [theme.breakpoints.down('xs')]: {
-        marginRight: '100%'
-      },
-    },
-    title: {
-      flexGrow: 1,
-    },
-    hide: {
-      display: 'none',
-    },
-    drawer: {
-      width: drawerWidth,
-      flexShrink: 0,
-    },
-    drawerPaper: {
-      width: drawerWidth,
-      [theme.breakpoints.down('xs')]: {
-        width: '100%'
-      },
-    },
-    drawerHeader: {
-      display: 'flex',
-      alignItems: 'center',
-      ...theme.mixins.toolbar,
-      justifyContent: 'flex-start',
-    },
-    content: {
-      flexGrow: 1,
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-      }),
-      marginRight: -drawerWidth,
-      [theme.breakpoints.down('xs')]: {
-        width: 0
-      },
-    },
-    contentShift: {
-      transition: theme.transitions.create('margin', {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen,
-      }),
-      marginRight: 0,
-    },
-  }),
-);
-
 const Room: React.FC = (props) => {
     const userVideo = useRef<HTMLVideoElement>(document.createElement('video'))
     const userStream = useRef<MediaStream>()
@@ -99,7 +33,7 @@ const Room: React.FC = (props) => {
     const [open, setOpen] = useState(false);
     const context = useContext(Context)
     const history = useHistory()
-    const classes = useStyles();
+    const classes = RoomMaterialStyles();
 
     useEffect(() => {
         init()
@@ -219,46 +153,24 @@ const Room: React.FC = (props) => {
         setPeers(peers => peers.filter(peer => peer.peerID !== id))
     }, [])
 
-    const exit = () => {
+    const exit = useCallback(() => {
         socketRef.current.disconnect()
         history.replace("/")
         userStream.current?.getTracks().forEach((track) => {
             track.stop();
         });
-    }
+    }, [])
 
-    const disconnected = (id: string) => {
+    const disconnected = useCallback((id: string) => {
         alert(id + "left the chat")
         peersRef.current = peersRef.current.filter(peer => peer.peerID !== id)
         removePeerVideo(id)
-    }
+    }, [])
     
     return(
         <div className={classes.root}>
             <CssBaseline />
-            <AppBar
-                position="fixed"
-                className={clsx(classes.appBar, {
-                [classes.appBarShift]: open,
-                })}
-                style={{height: 50}}
-            >
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        edge="end"
-                        onClick={() => setOpen(true)}
-                        className={clsx(open && classes.hide)}
-                        style={{ position: 'absolute', right: 20, top: 1 }}
-                    >
-                        {showChat && <svg width="1em" height="1em" viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg">
-                            <path fill-rule="evenodd" d="M2 1h12a1 1 0 0 1 1 1v11.586l-2-2A2 2 0 0 0 11.586 11H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zm12-1a2 2 0 0 1 2 2v12.793a.5.5 0 0 1-.854.353l-2.853-2.853a1 1 0 0 0-.707-.293H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12z"/>
-                            <path fill-rule="evenodd" d="M3 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 6a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 6zm0 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
-                        </svg>}
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
+            <Header setOpen={setOpen} showChat={showChat} />
             <main
                 className={clsx(classes.content, {
                     [classes.contentShift]: open,
