@@ -3,17 +3,35 @@
     height: 100vh;
     overflow: hidden;
 }
+
 #messagesContainer{
     overflow-y: scroll;
     overflow-x: hidden;
     height: 90%;
+    scrollbar-face-color: slategray;
+    scrollbar-track-color: #b8c0c8;
 }
+
 #input{
     position: absolute;
     bottom: 5px;
 }
+
 #backArrow {
     text-align: left;
     margin-top: 10px;
     cursor: pointer;
+}
+
+::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.5em;
+}
+
+::-webkit-scrollbar-thumb {
+    background: slategray;
+}
+
+::-webkit-scrollbar-track {
+    background: #b8c0c8;
 }
