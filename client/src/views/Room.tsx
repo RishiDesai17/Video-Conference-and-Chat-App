@@ -43,9 +43,9 @@ const Room: React.FC = (props) => {
         socketRef.current = io.connect("/")
         const stream: MediaStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true })
         userVideo.current.srcObject = userStream.current = stream
-        // const queryParams: queryString.ParsedQuery<string> = queryString.parse(window.location.search)
-        // console.log(queryParams.room)
-        if(context.state.host){
+        const queryParams: queryString.ParsedQuery<string> = queryString.parse(window.location.search)
+        console.log(queryParams.room)
+        if(queryParams.host && !queryParams.room){
             socketRef.current.emit("start meet")
             socketRef.current.on("roomID", (roomID: string) => {
                 console.log(roomID)
@@ -55,7 +55,7 @@ const Room: React.FC = (props) => {
         else{
             const queryParams: queryString.ParsedQuery<string> = queryString.parse(window.location.search)
             console.log(queryParams.room)
-            if(!queryParams.room || typeof queryParams.room !== 'string'){
+            if(queryParams.host || !queryParams.room || typeof queryParams.room !== 'string'){
                 alert("Enter a valid url")
                 exit()
                 return;

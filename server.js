@@ -38,8 +38,8 @@ io.on("connection", (socket) => {
         const roomID = uuid.v4()
         socket.join(roomID)
         socket.roomID = roomID
+        socket.isHost = true
         io.to(socket.id).emit("roomID", roomID)
-        // createMeet(roomID, )
         // console.log(Object.keys(io.sockets.adapter.sids[socket.id]))
     })
 
