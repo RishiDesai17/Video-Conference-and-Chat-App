@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Home from './views/Home';
 import Room from './views/Room';
 import Login from './views/Login';
 import Loader from './views/Loader';
 import ProtectedRoute from './protected-route/protected-route';
-import { Context } from './context/Context';
+import useStore from './zustand/store';
 import './App.css';
 
 const App: React.FC = () => {
-  const { init, state } = useContext(Context)
+  const { init, loading } = useStore(useCallback(state => ({ init: state.init, loading: state.loading }), []))
 
   useEffect(() => {
     init(true)
@@ -17,7 +17,7 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
-      {state.loading ?
+      {loading ?
         <Loader />
       :
         <BrowserRouter>

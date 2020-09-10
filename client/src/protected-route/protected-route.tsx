@@ -1,5 +1,5 @@
-import React, { Component, useContext } from 'react';
-import { Context } from '../context/Context';
+import React, { useCallback } from 'react';
+import useStore from '../zustand/store';
 import { Route, Redirect, RouteProps } from 'react-router-dom';
 
 interface Props extends RouteProps {
@@ -10,12 +10,12 @@ const ProtectedRoute: React.FC<Props> = ({
     component: Component,
     ...rest
 }) => {
-    const { state } = useContext(Context)
+    const loggedIn = useStore(useCallback(state => state.loggedIn, []))
     return(
         <Route 
             {...rest}
             render = {props => 
-                state.loggedIn ? (
+                loggedIn ? (
                     <Component {...props} />
                 ) : (
                     <Redirect to="/login" />

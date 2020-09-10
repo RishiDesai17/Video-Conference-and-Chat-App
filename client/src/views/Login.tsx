@@ -2,24 +2,25 @@ import React, { useState, useRef, useCallback, useContext, MouseEvent } from "re
 import { useHistory } from "react-router-dom";
 import { Button } from '@material-ui/core';
 import Register from "./Register";
+import useStore from '../zustand/store';
 import { Context } from '../context/Context';
-import axios from 'axios';
 import "./styles/Login.css";
 
 const Login: React.FC = () => {
     const [showLogin, setShowLogin] = useState<boolean>(true)
-    const { login } = useContext(Context)
+    const { login, loggedIn } = useStore(useCallback(state => ({ login: state.login, loggedIn: state.loggedIn }), []))
     const emailRef = useRef<string>("")
     const passwordRef = useRef<string>("")
     const history = useHistory()
 
-    const loginHandler = useCallback(async(e: MouseEvent) => {
+    if(loggedIn){
+        history.replace("/")
+    }
+
+    const loginHandler = useCallback((e: MouseEvent) => {
         e.preventDefault()
         if(loginValidation()){
-            const response = await login(emailRef.current, passwordRef.current)
-            if(response){
-                history.replace("/")
-            }
+            login(emailRef.current, passwordRef.current)
         }
         else{
             alert("Please fill in both the fields")

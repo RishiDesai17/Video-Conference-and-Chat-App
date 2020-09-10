@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState, useCallback, useContext } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import { useHistory } from 'react-router-dom';
 import * as queryString from 'query-string';
 import Video from '../components/Video';
-import { Context } from "../context/Context";
 import ChatBox from "../components/ChatBox";
 import Controls from '../components/Controls';
 import Header from '../components/Header';
@@ -23,7 +22,7 @@ interface Payload {
     id: string
 }
 
-const Room: React.FC = (props) => {
+const Room: React.FC = () => {
     const userVideo = useRef<HTMLVideoElement>(document.createElement('video'))
     const userStream = useRef<MediaStream>()
     const socketRef = useRef<SocketIOClient.Socket>(io.Socket)
@@ -31,7 +30,6 @@ const Room: React.FC = (props) => {
     const peersRef = useRef<Array<Peers>>([])
     const [showChat, setShowChat] = useState<boolean>(false)
     const [open, setOpen] = useState(false);
-    const context = useContext(Context)
     const history = useHistory()
     const classes = RoomMaterialStyles();
 

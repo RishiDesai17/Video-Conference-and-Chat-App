@@ -1,15 +1,11 @@
-import React, { useRef, useContext } from "react";
+import React, { useRef } from "react";
 import { useHistory } from "react-router-dom";
-import { Context } from '../context/Context';
-import axios from "axios";
 
 const Home: React.FC = () => {
     const inputRef = useRef<HTMLInputElement>(null)
     const history = useHistory()
-    const context = useContext(Context)
 
     const startMeet = async() => {
-        // context.meetHandler(true)
         // history.replace(`/room`)
         window.open(`/room?host=${true}`)
         // try{
@@ -23,7 +19,6 @@ const Home: React.FC = () => {
     }
 
     const joinRoom = () => {
-        // context.meetHandler(false)
         if(inputRef.current?.value !== ""){
             window.open(`/room?room=${inputRef.current?.value}`)
         }
