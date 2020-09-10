@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { Button } from '@material-ui/core';
 import Register from "./Register";
 import useStore from '../zustand/store';
-import { Context } from '../context/Context';
+import useWillMount from '../custom hooks/useWillMount';
 import "./styles/Login.css";
 
 const Login: React.FC = () => {
@@ -13,9 +13,11 @@ const Login: React.FC = () => {
     const passwordRef = useRef<string>("")
     const history = useHistory()
 
-    if(loggedIn){
-        history.replace("/")
-    }
+    useWillMount(() => {
+        if(loggedIn){
+            history.replace("/")
+        }
+    })
 
     const loginHandler = useCallback((e: MouseEvent) => {
         e.preventDefault()
