@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useContext, MouseEvent } from "react";
+import React, { useState, useRef, useCallback, MouseEvent } from "react";
 import { useHistory } from "react-router-dom";
 import { Button } from '@material-ui/core';
 import Register from "./Register";
