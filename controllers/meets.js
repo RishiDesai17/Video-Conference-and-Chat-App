@@ -1,11 +1,30 @@
 const Meet = require('../models/meet');
+const User = require('../models/user');
 
-exports.createMeet = async(room, hostID) => {
+exports.createMeet = async({ room, hostID }) => {
     try{
-        await new Meet({
+        const meet = await new Meet({
             room,
             members: [hostID]
-        }).save()
+        }).save();
+        await User.findByIdAndUpdate(hostID, {
+            $push: {
+                meets: meet._id
+            }
+        })
+    }
+    catch(err){
+        console.log(err)
+    }
+}
+
+exports.addMember = async({ userID, meetID }) => {
+    try{
+        await User.findByIdAndUpdate(userID, {
+            $push: {
+                meets: meetID
+            }
+        })
     }
     catch(err){
         console.log(err)
