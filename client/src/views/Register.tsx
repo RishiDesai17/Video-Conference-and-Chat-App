@@ -19,7 +19,7 @@ const Signup: React.FC = () => {
         if(loggedIn){
             history.replace("/")
         }
-    })
+    }, loggedIn)
 
     const register = async(e: MouseEvent) => {
         e.preventDefault()

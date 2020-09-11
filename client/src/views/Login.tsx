@@ -15,7 +15,7 @@ const Login: React.FC = () => {
         if(loggedIn){
             history.replace("/")
         }
-    })
+    }, loggedIn)
 
     const loginHandler = useCallback((e: MouseEvent) => {
         e.preventDefault()
