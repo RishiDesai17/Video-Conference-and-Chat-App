@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
 import { useHistory } from 'react-router-dom';
 import * as queryString from 'query-string';
 import Video from '../components/Video';
-import ChatBox from "../components/ChatBox";
+import ChatBox from '../components/ChatBox';
 import Controls from '../components/Controls';
 import Header from '../components/Header';
 import clsx from 'clsx';
-import { Drawer, Container, CssBaseline } from "@material-ui/core";
+import { Drawer, Container, CssBaseline } from '@material-ui/core';
 import './styles/Room.css';
 import RoomMaterialStyles from './styles/RoomMaterialstyles';
 
@@ -113,7 +113,7 @@ const Room: React.FC = () => {
         })
     }, [])
 
-    const createPeer = (userToSignal: string, callerID: string, stream: MediaStream) => {
+    const createPeer = useCallback((userToSignal: string, callerID: string, stream: MediaStream) => {
         console.log("create peer")
         const peer = new Peer({
             initiator: true,
@@ -126,9 +126,9 @@ const Room: React.FC = () => {
         })
 
         return peer
-    }
+    }, [])
 
-    const addPeer = (incomingSignal: any, callerID: string, stream: MediaStream) => {
+    const addPeer = useCallback((incomingSignal: any, callerID: string, stream: MediaStream) => {
         console.log("add peer")
         const peer = new Peer({
             initiator: false,
@@ -141,7 +141,7 @@ const Room: React.FC = () => {
         })
         peer.signal(incomingSignal)
         return peer
-    }
+    }, [])
 
     const addPeerVideo = useCallback((peerObj: Peers) => {
         setPeers(peers => [...peers, peerObj])

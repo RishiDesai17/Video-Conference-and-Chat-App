@@ -1,3 +1,11 @@
+#register-container {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    -ms-transform: translateY(16vh);
+    transform: translateY(16vh);
+}
+
 #inner-register-container {
     background-color: #FFCC99;
     border-radius: 5px;

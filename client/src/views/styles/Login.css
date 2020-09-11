@@ -25,6 +25,10 @@
     margin: 1.2rem;
 }
 
+.link{
+    color: black
+}
+
 #loginButton {
     background-color: #273a4d;
     color: white;
