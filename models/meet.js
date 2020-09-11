@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 const meetSchema = new mongoose.Schema({
-    room: {
+    _id: {
         type: String,
         required: true
     },

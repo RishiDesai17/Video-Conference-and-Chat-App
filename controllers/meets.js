@@ -1,11 +1,12 @@
 const Meet = require('../models/meet');
 const User = require('../models/user');
 
-exports.createMeet = async({ room, hostID }) => {
+exports.createMeet = async({ roomID, hostID }) => {
     try{
+        console.log(roomID)
         const meet = await new Meet({
-            room,
-            members: [hostID]
+            _id: roomID,
+            // members: [hostID] // add this after jwt infra done
         }).save();
         await User.findByIdAndUpdate(hostID, {
             $push: {
@@ -18,11 +19,11 @@ exports.createMeet = async({ room, hostID }) => {
     }
 }
 
-exports.addMember = async({ userID, meetID }) => {
+exports.addMember = async({ roomID, userID }) => {
     try{
         await User.findByIdAndUpdate(userID, {
             $push: {
-                meets: meetID
+                meets: roomID
             }
         })
     }
