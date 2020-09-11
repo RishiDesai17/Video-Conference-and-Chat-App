@@ -5,8 +5,10 @@ type State = {
     loading: boolean,
     loggedIn: boolean,
     profile: Profile,
+    access_token: string,
     init: (getprofile: boolean) => void,
-    login: (email: string, password: string) => void
+    login: (email: string, password: string) => void,
+    get_access_token: () => string
 }
 
 type Profile = {
@@ -17,16 +19,18 @@ type Profile = {
 const INIT_STATE = {
     loading: true,
     loggedIn: false,
+    access_token: "",
     profile: {
         name: "",
         email: ""
     }
 }
 
-const useStore = create<State>(set => ({
+const useStore = create<State>((set, get) => ({
     ...INIT_STATE,
     init: (getprofile) => init(set, getprofile),
-    login: (email: string, password: string) => login(set, email, password)
+    login: (email: string, password: string) => login(set, email, password),
+    get_access_token: () => get().access_token
 }))
 
 const init = async(set: SetState<State>, getprofile: boolean) => {
@@ -45,10 +49,12 @@ const init = async(set: SetState<State>, getprofile: boolean) => {
         let modified_state: {
             loading: boolean,
             loggedIn: boolean,
+            access_token: string,
             profile?: Profile
         } = {
             loading: false,
-            loggedIn: true
+            loggedIn: true,
+            access_token: response.data.access_token
         }
         if(getprofile) {
             modified_state.profile = response.data.profile
@@ -77,16 +83,15 @@ const login = async(set: SetState<State>, email: string, password: string) => {
             }
         )
         console.log(response.data)
+        const { access_token, profile } = response.data
         set({
             loggedIn: true,
-            profile: response.data.profile
+            access_token: access_token,
+            profile: profile
         })
-        return true
     }
     catch(err){
         console.log(err)
-        // alert
-        return false
     }
 }
 

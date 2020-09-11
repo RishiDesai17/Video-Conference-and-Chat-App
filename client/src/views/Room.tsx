@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import io from 'socket.io-client';
 import Peer from 'simple-peer';
+import useStore from '../zustand/store';
 import { useHistory } from 'react-router-dom';
 import * as queryString from 'query-string';
 import Video from '../components/Video';
@@ -30,6 +31,7 @@ const Room: React.FC = () => {
     const peersRef = useRef<Array<Peers>>([])
     const [showChat, setShowChat] = useState<boolean>(false)
     const [open, setOpen] = useState(false);
+    const get_access_token = useStore(useCallback(state => state.get_access_token, []))
     const history = useHistory()
     const classes = RoomMaterialStyles();
 
@@ -44,7 +46,7 @@ const Room: React.FC = () => {
         const queryParams: queryString.ParsedQuery<string> = queryString.parse(window.location.search)
         console.log(queryParams.room)
         if(queryParams.host && !queryParams.room){
-            socketRef.current.emit("start meet")
+            socketRef.current.emit("start meet", get_access_token())
             socketRef.current.on("roomID", (roomID: string) => {
                 console.log(roomID)
                 window.history.replaceState("", "", `?room=${roomID}`);
@@ -58,7 +60,7 @@ const Room: React.FC = () => {
                 exit()
                 return;
             }
-            socketRef.current.emit("join room", queryParams.room)
+            socketRef.current.emit("join room", { roomID: queryParams.room, jwtFromClient: get_access_token() })
             socketRef.current.on("invalid room", () => {
                 alert("Invalid room")
                 exit()
@@ -71,6 +73,7 @@ const Room: React.FC = () => {
             })
         }
         setShowChat(true)
+
         socketRef.current.on("all users", (users: string[]) => {
             const peers = users.reduce((result: Peers[], userID: string) => {
                 if(userID !== socketRef.current.id){
@@ -108,9 +111,16 @@ const Room: React.FC = () => {
                 item.peer.signal(signal)
             }
         })
+
+        socketRef.current.on("unauthorized", (message: string) => {
+            alert(message)
+            exit()
+        })
+
         socketRef.current.on("disconnected", (id: string) =>{
             disconnected(id)
         })
+
     }, [])
 
     const createPeer = useCallback((userToSignal: string, callerID: string, stream: MediaStream) => {

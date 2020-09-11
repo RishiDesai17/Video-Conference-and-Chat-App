@@ -7,6 +7,7 @@ const connectToDB = async() => {
             useNewUrlParser: true
         });
         mongoose.Promise = global.Promise;
+        console.log("Database connected!")
     }
     catch(err){
         console.log("Cannot connect to the Database")

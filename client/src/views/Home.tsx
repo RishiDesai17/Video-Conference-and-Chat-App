@@ -1,21 +1,10 @@
 import React, { useRef } from "react";
-import { useHistory } from "react-router-dom";
 
 const Home: React.FC = () => {
     const inputRef = useRef<HTMLInputElement>(null)
-    const history = useHistory()
 
     const startMeet = async() => {
-        // history.replace(`/room`)
         window.open(`/room?host=${true}`)
-        // try{
-        //     const response = await axios.get("room")
-        //     console.log(response)
-        //     window.open(`/room?room=${response.data}`)
-        // }
-        // catch(err){
-        //     console.log(err)
-        // }
     }
 
     const joinRoom = () => {

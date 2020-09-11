@@ -6,11 +6,11 @@ exports.createMeet = async({ roomID, hostID }) => {
         console.log(roomID)
         const meet = await new Meet({
             _id: roomID,
-            // members: [hostID] // add this after jwt infra done
+            members: [hostID]
         }).save();
         await User.findByIdAndUpdate(hostID, {
             $push: {
-                meets: meet._id
+                'meets': meet._id
             }
         })
     }
@@ -21,11 +21,18 @@ exports.createMeet = async({ roomID, hostID }) => {
 
 exports.addMember = async({ roomID, userID }) => {
     try{
-        await User.findByIdAndUpdate(userID, {
-            $push: {
-                meets: roomID
-            }
-        })
+        await Promise.all([
+            User.findByIdAndUpdate(userID, {
+                $push: {
+                    'meets': roomID
+                }
+            }),
+            Meet.findByIdAndUpdate(roomID, {
+                $push: {
+                    'members': userID
+                }
+            })
+        ])
     }
     catch(err){
         console.log(err)

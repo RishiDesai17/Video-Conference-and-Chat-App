@@ -2,6 +2,7 @@ const socket = require('socket.io')
 const http = require('http')
 const uuid = require('uuid')
 
+const { verifyJwt } = require('../infra/jwt');
 const { createMeet, addMember } = require('../controllers/meets')
 
 const attachWebSockets = app => {
@@ -11,43 +12,59 @@ const attachWebSockets = app => {
     io.on("connection", (socket) => {
         console.log("connection")
     
-        socket.on("start meet", () => {
-            console.log(socket.id)
-            const roomID = uuid.v4()
-            socket.join(roomID)
-            socket.roomID = roomID
-            socket.isHost = true
-            io.to(socket.id).emit("roomID", roomID)
-            createMeet({
-                roomID,
-                hostID: socket.id
-            })
+        socket.on("start meet", async(jwtFromClient) => {
+            try{
+                const { id, name } = await verifyJwt(jwtFromClient)
+                console.log(socket.id)
+                const roomID = uuid.v4()
+                socket.join(roomID)
+                socket.roomID = roomID
+                socket.isHost = true
+                socket.userName = name
+                io.to(socket.id).emit("roomID", roomID)
+                createMeet({
+                    roomID,
+                    hostID: id
+                })
+            }
+            catch(err){
+                console.log(err)
+                socket.emit("unauthorized", "Please login")
+            }
         })
     
-        socket.on("join room", (roomID) => {
-            console.log(roomID, socket.id)
-            if(!uuid.validate(roomID)){
-                socket.emit("invalid room")
-                return;
+        socket.on("join room", async({ roomID, jwtFromClient }) => {
+            try{
+                const { id, name } = await verifyJwt(jwtFromClient)
+                console.log(roomID, socket.id)
+                if(!uuid.validate(roomID)){
+                    socket.emit("invalid room")
+                    return;
+                }
+                const roomData = io.sockets.adapter.rooms[roomID]
+                if(!roomData){
+                    socket.emit("invalid room")
+                    return;
+                }
+                if(roomData.length > 100){
+                    socket.emit("room full")
+                    return;
+                }
+                socket.join(roomID)
+                socket.roomID = roomID
+                socket.userName = name
+                const usersInThisRoom = Object.keys(io.sockets.adapter.rooms[roomID].sockets)
+                console.log(usersInThisRoom)
+                io.to(socket.id).emit("all users", usersInThisRoom);
+                addMember({
+                    roomID,
+                    userID: id
+                })
             }
-            const roomData = io.sockets.adapter.rooms[roomID]
-            if(!roomData){
-                socket.emit("invalid room")
-                return;
+            catch(err){
+                console.log(err)
+                socket.emit("unauthorized", "Please login")
             }
-            if(roomData.length > 100){
-                socket.emit("room full")
-                return;
-            }
-            socket.join(roomID)
-            socket.roomID = roomID
-            const usersInThisRoom = Object.keys(io.sockets.adapter.rooms[roomID].sockets)
-            console.log(usersInThisRoom)
-            io.to(socket.id).emit("all users", usersInThisRoom);
-            addMember({
-                roomID,
-                userID: socket.id
-            })
         })
     
         socket.on("sending signal", payload => {

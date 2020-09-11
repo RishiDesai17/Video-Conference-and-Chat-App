@@ -1,9 +1,8 @@
-const jwt = require('jsonwebtoken');
+const { verifyJwt } = require('../infra/jwt');
 
-module.exports = (req,res,next) => {
+module.exports = async(req,res,next) => {
     try {
-        const token = req.headers.authorization.split(' ')[1];
-        const decoded = jwt.verify(token, process.env.SECRETKEY);
+        const decoded = await verifyJwt()
         req.userData = decoded;
         next();
     }
