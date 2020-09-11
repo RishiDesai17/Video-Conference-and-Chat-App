@@ -1,11 +1,13 @@
 const jwt = require('jsonwebtoken');
 
-exports.verifyJwt = (token_for_websocket_verification) => {
-    if(token_for_websocket_verification) {
-        return jwt.verify(token_for_websocket_verification, process.env.SECRETKEY);
-    }
+exports.verifyJwt = token => {
+    const decoded = jwt.verify(token, process.env.SECRETKEY);
+    return decoded
+}
+
+exports.extractJwt = () => {
     const token = req.headers.authorization.split(' ')[1];
-    return jwt.verify(token, process.env.SECRETKEY);
+    return this.verifyJwt(token)
 }
 
 exports.generateTokens = async(id, name) => {

@@ -1,8 +1,8 @@
-const { verifyJwt } = require('../infra/jwt');
+const { extractJwt } = require('../infra/jwt');
 
 module.exports = async(req,res,next) => {
     try {
-        const decoded = await verifyJwt()
+        const decoded = await extractJwt()
         req.userData = decoded;
         next();
     }
