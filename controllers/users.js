@@ -90,7 +90,7 @@ exports.refresh = async(req, res) => {
         }
         
         const { id, name } = jwt.verify(req.cookies.refresh_token_video_conf, process.env.REFRESHTOKENKEY)
-        console.log(id)
+        // console.log(id)
         const access_token = jwt.sign({ id, name }, process.env.SECRETKEY, {
             expiresIn: '600s'
         })

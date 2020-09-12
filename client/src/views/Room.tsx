@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import io from 'socket.io-client';
-import Peer from 'simple-peer';
+import Peer, { Instance, SignalData } from 'simple-peer';
 import useStore from '../zustand/store';
 import { useHistory } from 'react-router-dom';
 import * as queryString from 'query-string';
@@ -13,14 +13,19 @@ import { Drawer, Container, CssBaseline } from '@material-ui/core';
 import './styles/Room.css';
 import RoomMaterialStyles from './styles/RoomMaterialstyles';
 
-interface Peers {
+type Peers = {
     peerID: string,
-    peer: Peer.Instance
+    peer: Instance
 }
 
-interface Payload {
-    signal: any,
+type Payload = {
+    signal: SignalData,
     id: string
+}
+
+type DisconnectedUser = {
+    id: string,
+    username: string
 }
 
 const Room: React.FC = () => {
@@ -74,19 +79,30 @@ const Room: React.FC = () => {
         }
         setShowChat(true)
 
-        socketRef.current.on("all users", (users: string[]) => {
-            const peers = users.reduce((result: Peers[], userID: string) => {
-                if(userID !== socketRef.current.id){
-                    const peer = createPeer(userID, socketRef.current.id, stream);
-                    const peerObj = {
-                        peerID: userID,
-                        peer
-                    }
-                    peersRef.current.push(peerObj)
-                    result.push(peerObj)
+        socketRef.current.on("all members", (members: string[]) => {
+            console.log(members)
+            const peers = members.map((socketID: string) => {
+                const peer = createPeer(socketID, socketRef.current.id, stream);
+                const peerObj = {
+                    peerID: socketID,
+                    peer
                 }
-                return result
-            }, [])
+                peersRef.current.push(peerObj)
+                return peerObj
+            })
+
+            // const peers = users.reduce((result: Peers[], socketIDs: string) => {
+            //     if(socketIDs !== socketRef.current.id){
+            //         const peer = createPeer(socketIDs, socketRef.current.id, stream);
+            //         const peerObj = {
+            //             peerID: socketIDs,
+            //             peer
+            //         }
+            //         peersRef.current.push(peerObj)
+            //         result.push(peerObj)
+            //     }
+            //     return result
+            // }, [])
             console.log(peers)
             setPeers(peers)
         })
@@ -117,8 +133,8 @@ const Room: React.FC = () => {
             exit()
         })
 
-        socketRef.current.on("disconnected", (id: string) => {
-            disconnected(id)
+        socketRef.current.on("disconnected", ({ id, username }: DisconnectedUser) => {
+            disconnected({ id, username })
         })
 
         socketRef.current.on("something broke", (message: string) => {
@@ -129,7 +145,7 @@ const Room: React.FC = () => {
     }, [])
 
     const createPeer = useCallback((userToSignal: string, callerID: string, stream: MediaStream) => {
-        console.log("create peer")
+        // console.log("create peer")
         const peer = new Peer({
             initiator: true,
             trickle: false,
@@ -143,17 +159,19 @@ const Room: React.FC = () => {
         return peer
     }, [])
 
-    const addPeer = useCallback((incomingSignal: any, callerID: string, stream: MediaStream) => {
-        console.log("add peer")
+    const addPeer = useCallback((incomingSignal: SignalData, callerID: string, stream: MediaStream) => {
+        // console.log("add peer")
         const peer = new Peer({
             initiator: false,
             trickle: false,
             stream
         })
+
         peer.on("signal", (signal) => {
             console.log(signal)
             socketRef.current.emit("returning signal", { signal, callerID })
         })
+
         peer.signal(incomingSignal)
         return peer
     }, [])
@@ -174,8 +192,8 @@ const Room: React.FC = () => {
         });
     }, [])
 
-    const disconnected = useCallback((id: string) => {
-        alert(id + "left the chat")
+    const disconnected = useCallback(({ id, username }: DisconnectedUser) => {
+        alert(username + "left the chat")
         peersRef.current = peersRef.current.filter(peer => peer.peerID !== id)
         removePeerVideo(id)
     }, [])
@@ -204,7 +222,7 @@ const Room: React.FC = () => {
                     <video autoPlay playsInline ref={userVideo} />
                 </div>
             </main>
-             <Drawer
+            <Drawer
                 className={classes.drawer}
                 variant="persistent"
                 anchor="right"

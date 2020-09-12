@@ -3,7 +3,7 @@ const User = require('../models/user');
 
 exports.createMeet = async({ roomID, hostID }) => {
     try{
-        console.log(roomID)
+        // console.log(roomID)
         const meet = await new Meet({
             _id: roomID,
             members: [hostID]

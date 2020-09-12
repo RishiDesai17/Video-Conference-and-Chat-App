@@ -10,22 +10,22 @@ const attachWebSockets = app => {
     const io = socket(server)
 
     io.on("connection", (socket) => {
-        console.log("connection")
+        // console.log("connection")
     
         socket.on("start meet", async(jwtFromClient) => {
             try{
                 const { id, name } = await verifyJwt(jwtFromClient)
                 const roomID = uuid.v4()
-                socket.join(roomID)
                 socket.roomID = roomID
                 socket.isHost = true
                 socket.userName = name
+                socket.join(roomID)
                 io.to(socket.id).emit("roomID", roomID)
                 createMeet({
                     roomID,
                     hostID: id
                 })
-                console.log(socket.id)
+                console.log("start meet",socket.id)
             }
             catch(err){
                 if(err.name === "JsonWebTokenError"){
@@ -52,17 +52,17 @@ const attachWebSockets = app => {
                     socket.emit("room full")
                     return;
                 }
-                socket.join(roomID)
                 socket.roomID = roomID
                 socket.userName = name
-                const usersInThisRoom = Object.keys(io.sockets.adapter.rooms[roomID].sockets)
-                console.log(usersInThisRoom)
-                io.to(socket.id).emit("all users", usersInThisRoom);
+                const usersInThisRoom = Object.keys(roomData.sockets) // Object.keys(io.sockets.adapter.rooms[roomID].sockets)
+                socket.join(roomID)
+                console.log("all members", usersInThisRoom)
+                io.to(socket.id).emit("all members", usersInThisRoom);
                 addMember({
                     roomID,
                     userID: id
                 })
-                console.log(roomID, socket.id)
+                console.log("join room",roomID, socket.id)
             }
             catch(err){
                 console.log(err)
@@ -71,23 +71,23 @@ const attachWebSockets = app => {
         })
     
         socket.on("sending signal", payload => {
-            console.log("sending signal")
+            // console.log("sending signal")
             io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, id: payload.callerID });
         });
     
         socket.on("returning signal", payload => {
-            console.log("returning signal")
+            // console.log("returning signal")
             io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
         });
     
         socket.on("message", (message) => {
-            console.log(message, socket.roomID)
+            // console.log(message, socket.roomID)
             socket.broadcast.to(socket.roomID).emit('receive-message', { sender: socket.id, message });
         })
     
         socket.on("disconnect", () => {
-            console.log("disconnect " + socket.id)
-            socket.broadcast.to(socket.roomID).emit("disconnected", socket.id)
+            // console.log("disconnect " + socket.id)
+            socket.broadcast.to(socket.roomID).emit("disconnected", { id: socket.id, username: socket.userName })
         })
     })
     
