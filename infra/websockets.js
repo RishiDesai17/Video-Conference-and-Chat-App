@@ -3,7 +3,8 @@ const http = require('http')
 const uuid = require('uuid')
 
 const { verifyJwt } = require('../infra/jwt');
-const { createMeet, addMember } = require('../controllers/meets')
+const { createMeet, addMember } = require('../utils/meets');
+const { addMessage } = require('../utils/messages');
 
 const attachWebSockets = app => {
     const server = http.createServer(app);
@@ -82,7 +83,12 @@ const attachWebSockets = app => {
     
         socket.on("message", (message) => {
             // console.log(message, socket.roomID)
-            socket.broadcast.to(socket.roomID).emit('receive-message', { sender: socket.id, message });
+            socket.broadcast.to(socket.roomID).emit('receive-message', { sender: socket.userName, message });
+            addMessage({
+                meetID: socket.roomID,
+                sender: socket.userName,
+                message
+            })
         })
     
         socket.on("disconnect", () => {
