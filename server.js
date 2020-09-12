@@ -10,12 +10,16 @@ const connectToDB = require('./infra/db')
 const attachWebSockets = require('./infra/websockets')
 
 const userRoutes = require('./routes/users');
+const meetRoutes = require('./routes/meets');
+const messageRoutes = require('./routes/messages');
 
 app.use(morgan('dev'))
 app.use(express.json())
 app.use(cookieParser())
 
 app.use('/api/users', userRoutes);
+app.use('/api/meets', meetRoutes);
+app.use('/api/messages', messageRoutes);
 
 app.use(cors())
 
