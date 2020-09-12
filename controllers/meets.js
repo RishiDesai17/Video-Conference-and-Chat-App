@@ -23,12 +23,12 @@ exports.addMember = async({ roomID, userID }) => {
     try{
         await Promise.all([
             User.findByIdAndUpdate(userID, {
-                $push: {
+                $addToSet: {
                     'meets': roomID
                 }
             }),
             Meet.findByIdAndUpdate(roomID, {
-                $push: {
+                $addToSet: {
                     'members': userID
                 }
             })
