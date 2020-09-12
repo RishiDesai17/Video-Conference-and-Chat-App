@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
         select: false
     },
     meets: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Meet'
     }]
 },

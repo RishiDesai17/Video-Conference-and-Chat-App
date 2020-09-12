@@ -15,7 +15,6 @@ const attachWebSockets = app => {
         socket.on("start meet", async(jwtFromClient) => {
             try{
                 const { id, name } = await verifyJwt(jwtFromClient)
-                console.log(socket.id)
                 const roomID = uuid.v4()
                 socket.join(roomID)
                 socket.roomID = roomID
@@ -26,17 +25,20 @@ const attachWebSockets = app => {
                     roomID,
                     hostID: id
                 })
+                console.log(socket.id)
             }
             catch(err){
-                console.log(err)
-                socket.emit("unauthorized", "Please login")
+                if(err.name === "JsonWebTokenError"){
+                    socket.emit("unauthorized", "Please login again")
+                    return
+                }
+                socket.emit("something broke", "Oops! Something went wrong, please try again!")
             }
         })
     
         socket.on("join room", async({ roomID, jwtFromClient }) => {
             try{
                 const { id, name } = await verifyJwt(jwtFromClient)
-                console.log(roomID, socket.id)
                 if(!uuid.validate(roomID)){
                     socket.emit("invalid room")
                     return;
@@ -60,6 +62,7 @@ const attachWebSockets = app => {
                     roomID,
                     userID: id
                 })
+                console.log(roomID, socket.id)
             }
             catch(err){
                 console.log(err)

@@ -117,8 +117,13 @@ const Room: React.FC = () => {
             exit()
         })
 
-        socketRef.current.on("disconnected", (id: string) =>{
+        socketRef.current.on("disconnected", (id: string) => {
             disconnected(id)
+        })
+
+        socketRef.current.on("something broke", (message: string) => {
+            alert(message)
+            exit()
         })
 
     }, [])

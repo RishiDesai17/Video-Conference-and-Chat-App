@@ -6,7 +6,7 @@ const meetSchema = new mongoose.Schema({
         required: true
     },
     members: [{
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
     messages: [{
