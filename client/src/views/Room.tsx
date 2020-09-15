@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import Drawer from '../components/Drawer';
 import io from 'socket.io-client';
 import Peer, { Instance, SignalData } from 'simple-peer';
 import useStore from '../zustand/store';
@@ -9,7 +10,7 @@ import ChatBox from '../components/ChatBox';
 import Controls from '../components/Controls';
 import Header from '../components/Header';
 import clsx from 'clsx';
-import { Drawer, Container, CssBaseline } from '@material-ui/core';
+import { /*Drawer,*/ Container, CssBaseline } from '@material-ui/core';
 import './styles/Room.css';
 import RoomMaterialStyles from './styles/RoomMaterialstyles';
 
@@ -214,15 +215,15 @@ const Room: React.FC = () => {
                     ))}
                 </div>
                 <Container>
-                <div id="controls-box">
-                    <Controls exit={exit} />
-                </div>
+                    <div id="controls-box">
+                        <Controls exit={exit} />
+                    </div>
                 </Container>
                 <div id="self-video">
                     <video autoPlay playsInline ref={userVideo} />
                 </div>
             </main>
-            <Drawer
+            {/* <Drawer
                 className={classes.drawer}
                 variant="persistent"
                 anchor="right"
@@ -232,7 +233,14 @@ const Room: React.FC = () => {
                 }}
             >
                 {showChat && <ChatBox socket={socketRef.current} close={() => setOpen(false)} />}
-            </Drawer>
+            </Drawer> */}
+            <Drawer 
+                isChatbox={true}
+                showDrawer={showChat}
+                open={open}
+                setOpen={setOpen}
+                socket={socketRef.current}
+            />
         </div>
     )
 }

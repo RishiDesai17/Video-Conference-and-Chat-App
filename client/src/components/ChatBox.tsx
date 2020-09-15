@@ -2,12 +2,12 @@ import React, { useRef, useState, useCallback, useEffect, MouseEvent } from 'rea
 import Message from "./Message";
 import './styles/ChatBox.css'
 
-interface Props {
+type Props = {
     socket: SocketIOClient.Socket
     close: () => void
 }
 
-interface Chat {
+type Chat = {
     sender: string,
     message: string
 }
