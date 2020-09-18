@@ -33,10 +33,12 @@ const Room: React.FC = () => {
     const userVideo = useRef<HTMLVideoElement>(document.createElement('video'))
     const userStream = useRef<MediaStream>()
     const socketRef = useRef<SocketIOClient.Socket>(io.Socket)
-    const [peers, setPeers] = useState<Array<Peers>>([])
     const peersRef = useRef<Array<Peers>>([])
-    const [showChat, setShowChat] = useState<boolean>(false)
-    const [open, setOpen] = useState(false);
+
+    const [peers, setPeers] = useState<Array<Peers>>([])
+    const [showDrawerChildren, setShowDrawerChildren] = useState<boolean>(false)
+    const [open, setOpen] = useState<boolean>(false);
+    
     const get_access_token = useStore(useCallback(state => state.get_access_token, []))
     const history = useHistory()
     const classes = RoomMaterialStyles();
@@ -78,7 +80,7 @@ const Room: React.FC = () => {
                 return;
             })
         }
-        setShowChat(true)
+        setShowDrawerChildren(true)
 
         socketRef.current.on("all members", (members: string[]) => {
             console.log(members)
@@ -202,7 +204,7 @@ const Room: React.FC = () => {
     return(
         <div className={classes.root}>
             <CssBaseline />
-            <Header open={open} setOpen={setOpen} showChat={showChat} />
+            <Header open={open} setOpen={setOpen} showDrawerChildren={showDrawerChildren} />
             <main
                 className={clsx(classes.content, {
                     [classes.contentShift]: open,
@@ -232,11 +234,10 @@ const Room: React.FC = () => {
                     paper: classes.drawerPaper,
                 }}
             >
-                {showChat && <ChatBox socket={socketRef.current} close={() => setOpen(false)} />}
+                {showDrawerChildren && <ChatBox socket={socketRef.current} close={() => setOpen(false)} />}
             </Drawer> */}
-            <Drawer 
-                isChatbox={true}
-                showDrawer={showChat}
+            <Drawer
+                showDrawerChildren={showDrawerChildren}
                 open={open}
                 setOpen={setOpen}
                 socket={socketRef.current}

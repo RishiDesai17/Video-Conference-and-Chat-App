@@ -6,11 +6,11 @@ import HeaderMaterialstyles from './styles/HeaderMaterialstyles';
 
 interface Props {
     setOpen: (open: boolean) => void,
-    showChat: boolean,
+    showDrawerChildren: boolean,
     open: boolean
 }
 
-const Header: React.FC<Props> = ({ open, setOpen, showChat }) => {
+const Header: React.FC<Props> = ({ open, setOpen, showDrawerChildren }) => {
     const classes = HeaderMaterialstyles()
 
     return(
@@ -30,11 +30,11 @@ const Header: React.FC<Props> = ({ open, setOpen, showChat }) => {
                     className={clsx(open && classes.hide)}
                     style={{ position: 'absolute', right: 20, top: 1 }}
                 >
-                    {showChat && <ChatIcon />}
+                    {showDrawerChildren && <ChatIcon />}
                 </IconButton>
             </Toolbar>
         </AppBar>
     )
 }
 
-export default Header
+export default React.memo(Header)

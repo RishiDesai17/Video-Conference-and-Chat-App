@@ -1,17 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ChatBox from './ChatBox';
+import Members from './Members';
 import { Drawer } from '@material-ui/core';
 import DrawerMaterialStyles from './styles/DrawerMaterialStyles';
 
 type Props = {
-    isChatbox: boolean,
-    showDrawer: boolean,
+    showDrawerChildren: boolean,
     open: boolean,
     setOpen: (open: boolean) => void,
     socket: SocketIOClient.Socket
 }
 
-const DrawerComponent: React.FC<Props> = ({ isChatbox, showDrawer, socket, open, setOpen }) => {
+const DrawerComponent: React.FC<Props> = ({ showDrawerChildren, socket, open, setOpen }) => {
+    const [showChatbox, setShowChatbox] = useState<boolean>(true)
     const classes = DrawerMaterialStyles();
     
     return(
@@ -24,12 +25,13 @@ const DrawerComponent: React.FC<Props> = ({ isChatbox, showDrawer, socket, open,
                 paper: classes.drawerPaper,
             }}
         >
-            {showDrawer && 
+            {showDrawerChildren && 
                 <>
-                    {isChatbox ?
+                    <button onClick={() => setShowChatbox(!showChatbox)}>switch</button>
+                    {showChatbox ?
                         <ChatBox socket={socket} close={() => setOpen(false)} />
                     :
-                        <h1>Members</h1>
+                        <Members />
                     }
                 </>
             }

@@ -67,7 +67,11 @@ const attachWebSockets = app => {
             }
             catch(err){
                 console.log(err)
-                socket.emit("unauthorized", "Please login")
+                if(err.name === "JsonWebTokenError"){
+                    socket.emit("unauthorized", "Please login again")
+                    return
+                }
+                socket.emit("something broke", "Oops! Something went wrong, please try again!")
             }
         })
     

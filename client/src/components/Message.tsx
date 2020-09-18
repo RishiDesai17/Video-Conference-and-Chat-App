@@ -28,4 +28,4 @@ const Message: React.FC<Props> = ({ chat, socketID }) => {
     )
 }
 
-export default Message
+export default React.memo(Message)
