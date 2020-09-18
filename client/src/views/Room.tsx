@@ -14,14 +14,21 @@ import { /*Drawer,*/ Container, CssBaseline } from '@material-ui/core';
 import './styles/Room.css';
 import RoomMaterialStyles from './styles/RoomMaterialstyles';
 
-type Peers = {
+type Peer = {
     peerID: string,
-    peer: Instance
+    peer: Instance,
+    username: string
+}
+
+type Member = {
+    id: string,
+    username: string
 }
 
 type Payload = {
     signal: SignalData,
-    id: string
+    id: string,
+    username: string
 }
 
 type DisconnectedUser = {
@@ -33,9 +40,9 @@ const Room: React.FC = () => {
     const userVideo = useRef<HTMLVideoElement>(document.createElement('video'))
     const userStream = useRef<MediaStream>()
     const socketRef = useRef<SocketIOClient.Socket>(io.Socket)
-    const peersRef = useRef<Array<Peers>>([])
+    const peersRef = useRef<Array<Peer>>([])
 
-    const [peers, setPeers] = useState<Array<Peers>>([])
+    const [peers, setPeers] = useState<Array<Peer>>([])
     const [showDrawerChildren, setShowDrawerChildren] = useState<boolean>(false)
     const [open, setOpen] = useState<boolean>(false);
     
@@ -82,13 +89,14 @@ const Room: React.FC = () => {
         }
         setShowDrawerChildren(true)
 
-        socketRef.current.on("all members", (members: string[]) => {
+        socketRef.current.on("all members", (members: Member[]) => {
             console.log(members)
-            const peers = members.map((socketID: string) => {
-                const peer = createPeer(socketID, socketRef.current.id, stream);
+            const peers = members.map((member: Member) => {
+                const peer = createPeer(member.id, socketRef.current.id, stream);
                 const peerObj = {
-                    peerID: socketID,
-                    peer
+                    peerID: member.id,
+                    peer,
+                    username: member.username
                 }
                 peersRef.current.push(peerObj)
                 return peerObj
@@ -112,11 +120,12 @@ const Room: React.FC = () => {
 
         socketRef.current.on("user joined", (payload: Payload) => {
             console.log("user joined")
-            const { signal, id } = payload
+            const { signal, id, username } = payload
             const peer = addPeer(signal, id, stream)
-            const peerObj: Peers = {
+            const peerObj: Peer = {
                 peerID: id,
-                peer
+                peer,
+                username
             }
             peersRef.current.push(peerObj)
             addPeerVideo(peerObj)
@@ -125,7 +134,7 @@ const Room: React.FC = () => {
         socketRef.current.on("receiving returned signal", (payload: Payload) => {
             console.log("receiving returned signal")
             const { signal, id } = payload
-            const item = peersRef.current.find((p: Peers) => p.peerID === id);
+            const item = peersRef.current.find((p: Peer) => p.peerID === id);
             if(item){
                 item.peer.signal(signal)
             }
@@ -179,7 +188,7 @@ const Room: React.FC = () => {
         return peer
     }, [])
 
-    const addPeerVideo = useCallback((peerObj: Peers) => {
+    const addPeerVideo = useCallback((peerObj: Peer) => {
         setPeers(peers => [...peers, peerObj])
     }, [])
 
@@ -241,6 +250,7 @@ const Room: React.FC = () => {
                 open={open}
                 setOpen={setOpen}
                 socket={socketRef.current}
+                peers={peers}
             />
         </div>
     )

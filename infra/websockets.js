@@ -55,10 +55,19 @@ const attachWebSockets = app => {
                 }
                 socket.roomID = roomID
                 socket.userName = name
+                const usersInThisRoom1 = []
+                for(let key in roomData.sockets){
+                    console.log(io.sockets.connected[key].userName)
+                    console.log(key.userName)
+                    usersInThisRoom1.push({
+                        id: key,
+                        username: io.sockets.connected[key].userName
+                    })
+                }
                 const usersInThisRoom = Object.keys(roomData.sockets) // Object.keys(io.sockets.adapter.rooms[roomID].sockets)
                 socket.join(roomID)
                 console.log("all members", usersInThisRoom)
-                io.to(socket.id).emit("all members", usersInThisRoom);
+                io.to(socket.id).emit("all members", usersInThisRoom1);
                 addMember({
                     roomID,
                     userID: id
@@ -77,7 +86,7 @@ const attachWebSockets = app => {
     
         socket.on("sending signal", payload => {
             // console.log("sending signal")
-            io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, id: payload.callerID });
+            io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, id: payload.callerID, username: socket.userName });
         });
     
         socket.on("returning signal", payload => {

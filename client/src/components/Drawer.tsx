@@ -3,15 +3,23 @@ import ChatBox from './ChatBox';
 import Members from './Members';
 import { Drawer } from '@material-ui/core';
 import DrawerMaterialStyles from './styles/DrawerMaterialStyles';
+import { Instance } from 'simple-peer';
 
 type Props = {
     showDrawerChildren: boolean,
     open: boolean,
     setOpen: (open: boolean) => void,
     socket: SocketIOClient.Socket
+    peers: Peer[]
 }
 
-const DrawerComponent: React.FC<Props> = ({ showDrawerChildren, socket, open, setOpen }) => {
+type Peer = {
+    peerID: string,
+    peer: Instance,
+    username: string
+}
+
+const DrawerComponent: React.FC<Props> = ({ showDrawerChildren, socket, open, setOpen, peers }) => {
     const [showChatbox, setShowChatbox] = useState<boolean>(true)
     const classes = DrawerMaterialStyles();
     
@@ -31,7 +39,7 @@ const DrawerComponent: React.FC<Props> = ({ showDrawerChildren, socket, open, se
                     {showChatbox ?
                         <ChatBox socket={socket} close={() => setOpen(false)} />
                     :
-                        <Members />
+                        <Members peers={peers} />
                     }
                 </>
             }
