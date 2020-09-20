@@ -5,15 +5,16 @@ const drawerWidth = 300;
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     drawer: {
-        width: drawerWidth,
-        flexShrink: 0,
+      width: drawerWidth,
+      flexShrink: 0
+    },
+    drawerPaper: {
+      width: drawerWidth,
+      backgroundColor: '#dbdbdb',
+      [theme.breakpoints.down('xs')]: {
+        width: '100%'
       },
-      drawerPaper: {
-        width: drawerWidth,
-        [theme.breakpoints.down('xs')]: {
-          width: '100%'
-        },
-      },
+    },
   }),
 );
 

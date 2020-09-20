@@ -12,7 +12,7 @@ type Chat = {
     message: string
 }
 
-const ChatBox: React.FC<Props> = ({ socket, close }) => {
+const ChatBox: React.FC<Props> = ({ socket }) => {
     const inputRef = useRef<HTMLInputElement>(null)
     const [chats, setChats] = useState<Array<Chat>>([])
 
@@ -23,7 +23,7 @@ const ChatBox: React.FC<Props> = ({ socket, close }) => {
         })
     }, [])
 
-    const sendMessage = (e: MouseEvent) => {
+    const sendMessage = useCallback((e: MouseEvent) => {
         e.preventDefault()
         console.log("send")
         if(inputRef.current && inputRef.current?.value !== ""){
@@ -36,7 +36,7 @@ const ChatBox: React.FC<Props> = ({ socket, close }) => {
             addToChat(chatObj)
             inputRef.current.value = ""
         }
-    }
+    }, [])
 
     const addToChat = useCallback((chatObj: Chat) => {
         console.log("add")
@@ -46,11 +46,6 @@ const ChatBox: React.FC<Props> = ({ socket, close }) => {
     return(
         <div id="chatbox">
             {/* <h1>Chat</h1> */}
-            <div id="backArrow" onClick={close}>
-                <svg width="2em" height="2em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
-                </svg>
-            </div>
             <div id="messagesContainer">
                 {chats.map((chat, index) => (
                     <Message key={index} chat={chat} socketID={socket.id} />

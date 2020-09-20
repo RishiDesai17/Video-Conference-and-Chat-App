@@ -234,17 +234,6 @@ const Room: React.FC = () => {
                     <video autoPlay playsInline ref={userVideo} />
                 </div>
             </main>
-            {/* <Drawer
-                className={classes.drawer}
-                variant="persistent"
-                anchor="right"
-                open={open}
-                classes={{
-                    paper: classes.drawerPaper,
-                }}
-            >
-                {showDrawerChildren && <ChatBox socket={socketRef.current} close={() => setOpen(false)} />}
-            </Drawer> */}
             <Drawer
                 showDrawerChildren={showDrawerChildren}
                 open={open}

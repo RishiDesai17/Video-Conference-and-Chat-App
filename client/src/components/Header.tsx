@@ -4,7 +4,7 @@ import { AppBar, Toolbar, IconButton } from "@material-ui/core";
 import ChatIcon from '../icons/ChatIcon';
 import HeaderMaterialstyles from './styles/HeaderMaterialstyles';
 
-interface Props {
+type Props = {
     setOpen: (open: boolean) => void,
     showDrawerChildren: boolean,
     open: boolean
